@@ -1,67 +1,1650 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-7" />
-        <meta name="viewport" content="width=device-width, initial-scale=2" />
-        <title></title>
-        <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/firacode-nerd-font.css"
-        />
-        <link href="css/style.css" rel="stylesheet" />
-    </head>
-    <body>
-        <nav class="navbar">
-            <div class="left-menu"> <span class="icon">&#xf0ec0</span> Penguin Club</div>
+<!DOCTYPE html>
+<html lang="en" data-theme="github-monospace-vandice">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penguin_Club Food store - Healthy & Spicy Canteen Snacks</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 1. GITHUB-MONOSPACE-VANDICE (DEFAULT) */
+        [data-theme="github-monospace-vandice"] {
+            --bg-main: #0d1117;
+            --bg-card: #161b22;
+            --bg-card-hover: #1f242d;
+            --bg-input: #21262d;
+            --text-main: #c9d1d9;
+            --text-heading: #f0f6fc;
+            --text-muted: #8b949e;
+            --accent-primary: #2ea043;
+            --accent-primary-hover: #3fb950;
+            --accent-secondary: #a371f7;
+            --accent-coral: #f85149;
+            --accent-gold: #e3b341;
+            --border-color: #30363d;
+            --font-accent: 'JetBrains Mono', monospace;
+            --shadow-glow: 0 0 20px rgba(46, 160, 67, 0.15);
+        }
 
-            <ul class="right-menu">
-                <li><a href="">Home</a></li>
-                <li><a href="">About us</a></li>
-                <li><a href="">memory</a></li>
-                <li><a href="" id="Clock">2027-07-11 : AM</a></li>
-            </ul>
-        </nav>
+        /* 2. KANAGAWA-DRAGON */
+        [data-theme="kanagawa-dragon"] {
+            --bg-main: #12120f;
+            --bg-card: #181616;
+            --bg-card-hover: #221f1e;
+            --bg-input: #282727;
+            --text-main: #c5c9c5;
+            --text-heading: #c8c093;
+            --text-muted: #8a8880;
+            --accent-primary: #c84053;
+            --accent-primary-hover: #d24e61;
+            --accent-secondary: #e6c384;
+            --accent-coral: #e46876;
+            --accent-gold: #e6c384;
+            --border-color: #363434;
+            --font-accent: 'Outfit', sans-serif;
+            --shadow-glow: 0 0 20px rgba(230, 195, 132, 0.12);
+        }
 
-        <div id="HomePage">
-            <div width="500" height="400" class="window" id="ASCII">
-                <div class="Heading">
-                    <div></div>
-                    <h4>ASCII PenguinClub</h4>
+        /* 3. TOKYO NIGHT */
+        [data-theme="tokyo-night"] {
+            --bg-main: #1a1b26;
+            --bg-card: #24283b;
+            --bg-card-hover: #2f354f;
+            --bg-input: #1f2335;
+            --text-main: #a9b1d6;
+            --text-heading: #c0caf5;
+            --text-muted: #565f89;
+            --accent-primary: #7aa2f7;
+            --accent-primary-hover: #89ddff;
+            --accent-secondary: #bb9af7;
+            --accent-coral: #f7768e;
+            --accent-gold: #e0af68;
+            --border-color: #414868;
+            --font-accent: 'Outfit', sans-serif;
+            --shadow-glow: 0 0 20px rgba(122, 162, 247, 0.2);
+        }
+
+        /* 4. ONE DARK */
+        [data-theme="one-dark"] {
+            --bg-main: #1e222a;
+            --bg-card: #252b37;
+            --bg-card-hover: #2c3342;
+            --bg-input: #1b1f27;
+            --text-main: #abb2bf;
+            --text-heading: #e06c75;
+            --text-muted: #5c6370;
+            --accent-primary: #61afef;
+            --accent-primary-hover: #528bff;
+            --accent-secondary: #c678dd;
+            --accent-coral: #e06c75;
+            --accent-gold: #d19a66;
+            --border-color: #3e4451;
+            --font-accent: 'Inter', sans-serif;
+            --shadow-glow: 0 0 20px rgba(97, 175, 239, 0.18);
+        }
+
+        /* Global Theme Rules */
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .theme-font-accent {
+            font-family: var(--font-accent);
+        }
+
+        .bg-theme-main { background-color: var(--bg-main); }
+        .bg-theme-card { background-color: var(--bg-card); }
+        .bg-theme-card-hover:hover { background-color: var(--bg-card-hover); }
+        .bg-theme-input { background-color: var(--bg-input); }
+        .text-theme-heading { color: var(--text-heading); }
+        .text-theme-main { color: var(--text-main); }
+        .text-theme-muted { color: var(--text-muted); }
+        .border-theme { border-color: var(--border-color); }
+
+        .btn-accent {
+            background-color: var(--accent-primary);
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .btn-accent:hover {
+            background-color: var(--accent-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--bg-main);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 8px;
+        }
+
+        .card-shuffle-anim {
+            animation: cardShuffle 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes cardShuffle {
+            0% { transform: scale(0.95) translateY(10px); opacity: 0.5; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .shake-animation {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-900">
+
+    <header class="sticky top-0 z-40 bg-theme-card border-b border-theme shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Branding -->
+            <div class="flex items-center space-x-3 cursor-pointer group" onclick="setActiveTab('top')">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-rose-500 flex items-center justify-center text-slate-950 font-black shadow-md group-hover:scale-105 transition duration-300">
+                    <i class="fa-solid fa-penguin text-2xl text-slate-950"></i>
                 </div>
-                <div id="ASCII-body">
-                    <pre id="ascii-art">
+                <div>
+                    <span class="font-display text-xl sm:text-2xl font-black text-theme-heading tracking-tight flex items-center gap-2">
+                        Penguin_Club <span class="text-[var(--accent-primary)] font-extrabold text-sm sm:text-base bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/30">Food store</span> 🍿
+                    </span>
+                    <p class="text-xs text-theme-muted hidden sm:block">Healthy & Zesty Campus Canteen Snacks</p>
+                </div>
+            </div>
 
-                                       %%%%%%%%%%%%%%@@%%%%%%%%%%%%*
-                                      %@@@@@@@@@@@@@@@@@@@@@@@@@@@@#
-                                   %@@%###%#%%%%%%%%%%%%%%%%%%%%###%@@@*
-                                @@@###%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@###%@@*
-                             %%%%%@%%%#++*%%%#################%%**%#%%%@%%###*
-                            @@@@##@@@@+  :***++++++=====++====**:  .@@@@##%@@*
-                            %###@@. .**++++++===++++++++=====+++++++**  %@%##*
-                            %%%%@@==+********+++++++++++====+*********++%@@%%*
-                          %@%%%%@@***+=+++++++++++++++++++===++++++++***%@%%%*@@
-                          %@@@@%++***...     =*****+++++**-..      ..-***+*@@@@@=
-                       %@%***#@%**...           ..-*****.:            ..=+*@@#**%@#
-                       %@@**+#@%#*.               .---:: .              =**@@***@@%
-                       %@@+++*@%**      ....       ..         .....     +**@@*++%@%
-                       %@@###%@%**     +@%:                     *@#.    =+*@@#**@@%+
-                       %@@###%@%#*     +@@%#+   :--:::::--.   ##%@#.    =+*@@%##@@%
-                       %@@###%@%#*     +@@@@* ..-==-----==:.. @@@@#.    =+*@@%##@@%*
-                       %@@%%%%@%#*     +@@@@*.===--:::::--==- %@@@#.    =+*@@%##@@%*
-                       %@@%%%%@%#*           .+++==-----==++=           =+*%%%%%@@%+
-                       %@%%%%@@%#*...        .:-=+++++++++-::         ..+###%%@%##*-
-                          @@@@@%#*:::           -=========.          .::*@@##%@@=
-                               =****+::...                      ...::=@@%##@@*
-                                **********++++=======+@@@@@@@@@@@@%#####%@@
-                                 *********************@@=-=##%%%%%%@@@@@*##
-                                     ****************#@@*+*%%%%%%%%%%%%%*
-                                                     %%%%%%%%%%%%%%
-                    </pre>
-                    <div class="ASCII-labels"><span class="icon">&#xf192; &#xf192; &#xf192;</span></div>
+            <!-- Header Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                
+                <!-- Notice Button -->
+                <button onclick="openNoticeModal()" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-bullhorn text-amber-400"></i>
+                    <span class="hidden md:inline">Canteen Notice</span>
+                </button>
+
+                <!-- Letter Generator Button -->
+                <button onclick="openLetterModal()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-envelope-open-text text-rose-400"></i>
+                    <span class="hidden md:inline">Draft Letter</span>
+                </button>
+
+                <!-- Color Scheme Dropdown -->
+                <div class="relative hidden sm:block">
+                    <label for="theme-selector" class="sr-only">Color Scheme Selector</label>
+                    <div class="flex items-center gap-1.5 bg-theme-input border border-theme px-3 py-2 rounded-xl text-xs font-bold text-theme-heading">
+                        <i class="fa-solid fa-palette text-[var(--accent-secondary)]"></i>
+                        <select id="theme-selector" onchange="changeColorScheme(this.value)" class="bg-transparent border-none focus:outline-none text-theme-heading font-semibold text-xs cursor-pointer">
+                            <option value="github-monospace-vandice">github-monospace-vandice (default)</option>
+                            <option value="kanagawa-dragon">kanagawa-dragon</option>
+                            <option value="tokyo-night">tokyo night</option>
+                            <option value="one-dark">one dark</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Admin Protected Toggle Button -->
+                <button id="admin-toggle-btn" onclick="handleAdminToggleClick()" class="bg-theme-input hover:border-[var(--accent-coral)] text-theme-heading font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 border border-theme transition">
+                    <i id="admin-lock-icon" class="fa-solid fa-lock text-amber-400"></i>
+                    <span id="admin-mode-text" class="hidden sm:inline">Admin Mode</span>
+                </button>
+
+                <!-- Manage Snacks Modal Button -->
+                <button id="manage-btn" onclick="requestManageModalAccess()" class="bg-theme-input hover:border-[var(--accent-primary)] text-theme-heading font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 border border-theme transition">
+                    <i class="fa-solid fa-sliders text-[var(--accent-primary)]"></i>
+                    <span class="hidden lg:inline">Manage Snacks</span>
+                </button>
+
+                <!-- Suggest Button -->
+                <button onclick="openSuggestModal()" class="btn-accent font-bold px-3.5 sm:px-4 py-2 rounded-xl shadow-md text-xs sm:text-sm flex items-center gap-1.5 active:scale-95">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">Suggest Snack</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="pt-8 pb-4 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto text-center">
+            
+            <!-- Mobile Theme Switcher -->
+            <div class="sm:hidden mb-4 max-w-xs mx-auto">
+                <label for="theme-selector-mobile" class="sr-only">Mobile Theme Selector</label>
+                <div class="flex items-center justify-center gap-1.5 bg-theme-input border border-theme px-3 py-2 rounded-xl text-xs font-bold text-theme-heading">
+                    <i class="fa-solid fa-palette text-[var(--accent-secondary)]"></i>
+                    <select id="theme-selector-mobile" onchange="changeColorScheme(this.value)" class="bg-transparent border-none focus:outline-none text-theme-heading font-semibold text-xs">
+                        <option value="github-monospace-vandice">github-monospace-vandice (default)</option>
+                        <option value="kanagawa-dragon">kanagawa-dragon</option>
+                        <option value="tokyo-night">tokyo night</option>
+                        <option value="one-dark">one dark</option>
+                    </select>
+                </div>
+            </div>
+
+            <h1 class="font-display text-2xl sm:text-4xl font-black text-theme-heading tracking-tight max-w-3xl mx-auto leading-tight">
+                Penguin_Club <span class="text-[var(--accent-primary)]">Healthy & Spicy Snacks</span>
+            </h1>
+            <p class="mt-2 text-theme-muted text-xs sm:text-sm max-w-2xl mx-auto">
+                Fresh, healthy, and spicy canteen snacks that won't get banned! Rate, upvote, and generate request letters for the Canteen Manager.
+            </p>
+
+            <!-- Navigation Bar Tabs -->
+            <div class="mt-6 flex flex-wrap justify-center gap-2 sm:gap-3">
+                <button id="tab-top" onclick="setActiveTab('top')" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 border border-theme">
+                    <i class="fa-solid fa-trophy text-[var(--accent-gold)]"></i>
+                    <span>Most Loved Snacks</span>
+                </button>
+                <button id="tab-random" onclick="setActiveTab('random')" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 border border-theme">
+                    <i class="fa-solid fa-shuffle text-[var(--accent-coral)]"></i>
+                    <span>Snack Roulette (Random)</span>
+                </button>
+                <button id="tab-all" onclick="setActiveTab('all')" class="px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 border border-theme">
+                    <i class="fa-solid fa-list-check text-[var(--accent-primary)]"></i>
+                    <span>All Canteen Snacks</span>
+                </button>
+            </div>
+
+            <!-- Search, Category & Sorting Bar -->
+            <div class="mt-6 max-w-4xl mx-auto bg-theme-card p-3 rounded-2xl border border-theme flex flex-col sm:flex-row gap-3 shadow-xl">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-theme-muted"></i>
+                    <input type="text" id="search-input" oninput="handleFilterChange()" placeholder="Search canteen snacks (Cookie, Salted peanuts, Fruit salad, Custard, Corn chat...)..." class="w-full pl-10 pr-4 py-2 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs sm:text-sm text-theme-main placeholder:text-theme-muted">
+                </div>
+                <div class="sm:w-44">
+                    <select id="category-filter" onchange="handleFilterChange()" class="w-full py-2 px-3 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs sm:text-sm text-theme-heading font-semibold">
+                        <option value="ALL">All Categories</option>
+                        <option value="Cold Beverage">Cold Beverage</option>
+                        <option value="Quick Bites">Quick Bites</option>
+                        <option value="Bakery & Sweet">Bakery & Sweet</option>
+                        <option value="Hot Snack">Hot Snack</option>
+                    </select>
+                </div>
+                <div class="sm:w-40" id="sort-wrapper">
+                    <select id="sort-option" onchange="handleFilterChange()" class="w-full py-2 px-3 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs sm:text-sm text-theme-heading font-semibold">
+                        <option value="highest">Highest Rating</option>
+                        <option value="votes">Most Upvotes</option>
+                        <option value="newest">Recently Added</option>
+                        <option value="name">Name (A-Z)</option>
+                    </select>
                 </div>
             </div>
         </div>
-        <script src="JS/window.js"></script>
-        <script src="JS/index.js"></script>
-    </body>
+    </section>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        
+        <!-- Section Header Bar -->
+        <div class="flex items-center justify-between mb-6 pb-3 border-b border-theme">
+            <div>
+                <h2 id="section-title" class="font-display text-xl sm:text-2xl font-black text-theme-heading flex items-center gap-2">
+                    <!-- Dynamic Title -->
+                </h2>
+                <p id="section-subtitle" class="text-theme-muted text-xs mt-0.5">
+                    <!-- Dynamic Subtitle -->
+                </p>
+            </div>
+            
+            <button id="shuffle-btn" onclick="reshuffleRandomList()" class="hidden bg-theme-input hover:border-[var(--accent-primary)] text-theme-heading font-bold px-3.5 py-1.5 rounded-xl text-xs transition flex items-center gap-1.5 border border-theme active:scale-95">
+                <i class="fa-solid fa-rotate-right text-[var(--accent-primary)]"></i>
+                <span>Spin Again</span>
+            </button>
+        </div>
+
+        <!-- Food Grid -->
+        <div id="food-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Cards Injected Here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16 bg-theme-card rounded-3xl border border-dashed border-theme p-8 my-6">
+            <div class="w-16 h-16 bg-theme-input rounded-2xl flex items-center justify-center text-[var(--accent-primary)] text-2xl mx-auto mb-3">
+                <i class="fa-solid fa-cookie-bite"></i>
+            </div>
+            <h3 class="font-display text-lg font-bold text-theme-heading">No Canteen Snack Found!</h3>
+            <p class="text-theme-muted text-xs mt-1 max-w-md mx-auto">No dish matches your search or all items were removed. Suggest a new healthy snack or ask an admin to restore default canteen snacks.</p>
+            <div class="mt-4 flex justify-center gap-3">
+                <button onclick="openSuggestModal()" class="btn-accent font-bold px-4 py-2 rounded-xl text-xs inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Suggest Snack</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 1. WELCOME ANNOUNCEMENT POPUP MODAL -->
+    <div id="notice-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-theme-card rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-amber-500/40 text-left">
+            
+            <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-2xl mb-4">
+                <i class="fa-solid fa-bullhorn"></i>
+            </div>
+
+            <h3 class="font-display text-xl font-black text-theme-heading tracking-tight">
+                📢 Important Announcement from Penguin_Club Canteen!
+            </h3>
+            <p class="text-xs text-theme-muted mt-1 border-b border-theme pb-3">
+                Welcome to our campus snack discovery portal. Please read our guidelines:
+            </p>
+
+            <div class="mt-4 space-y-3.5 text-xs text-theme-main">
+                
+                <div class="flex items-start gap-3 bg-theme-input p-3 rounded-2xl border border-theme">
+                    <div class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex-shrink-0 flex items-center justify-center font-bold text-xs mt-0.5">
+                        1
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-theme-heading">Healthy & Approved Snacks Only</h4>
+                        <p class="text-theme-muted mt-0.5 leading-relaxed">
+                            Add something that is sound and looks healthy. Also it should be healthy and will not be banned from canteen!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 bg-theme-input p-3 rounded-2xl border border-theme">
+                    <div class="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/30 flex-shrink-0 flex items-center justify-center font-bold text-xs mt-0.5">
+                        2
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-theme-heading">Good Comments & Reviews</h4>
+                        <p class="text-theme-muted mt-0.5 leading-relaxed">
+                            Add good comments! This webpage will be updated regularly based on student votes and reviews.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 bg-theme-input p-3 rounded-2xl border border-theme">
+                    <div class="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/30 flex-shrink-0 flex items-center justify-center font-bold text-xs mt-0.5">
+                        3
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-theme-heading">Together We Request the Canteen Person!</h4>
+                        <p class="text-theme-muted mt-0.5 leading-relaxed font-semibold">
+                            Me alone can't do the change SO I WANT YOU PEOPLE TO MAKE A LETTER AND GIVE SUGGESTION OR REQUEST TO THE CANTEEN PERSON!
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-6 flex flex-col sm:flex-row gap-2">
+                <button onclick="openLetterModal(); closeNoticeModal();" class="flex-1 py-2.5 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 font-bold rounded-xl border border-rose-500/40 text-xs transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    <span>Draft Letter Now</span>
+                </button>
+                <button onclick="closeNoticeModal()" class="flex-1 py-2.5 btn-accent font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-check"></i>
+                    <span>I Understand & Agree</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. CANTEEN REQUEST LETTER GENERATOR MODAL -->
+    <div id="letter-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-theme-card rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl relative border border-theme overflow-hidden">
+            
+            <div class="p-5 border-b border-theme flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center text-lg border border-rose-500/30">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-theme-heading">Canteen Request Letter Generator</h3>
+                        <p class="text-xs text-theme-muted">Generate a formal letter for the Canteen Manager requesting top healthy snacks</p>
+                    </div>
+                </div>
+                <button onclick="closeLetterModal()" class="text-theme-muted hover:text-theme-heading w-8 h-8 rounded-full flex items-center justify-center bg-theme-input transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <div class="p-5 overflow-y-auto custom-scrollbar flex-grow space-y-4">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-theme-heading uppercase tracking-wider mb-1">Student Group / Class</label>
+                        <input type="text" id="letter-group-input" oninput="generateLetterText()" value="Penguin_Club Students & Campus Foodies" class="w-full px-3 py-1.5 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs text-theme-main">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-theme-heading uppercase tracking-wider mb-1">Canteen Person / Manager Name</label>
+                        <input type="text" id="letter-manager-input" oninput="generateLetterText()" value="Canteen Manager / In-Charge" class="w-full px-3 py-1.5 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs text-theme-main">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-theme-heading uppercase tracking-wider mb-1">Select Snacks to Request</label>
+                    <div id="letter-snack-checkboxes" class="flex flex-wrap gap-2 bg-theme-input p-3 rounded-xl border border-theme max-h-28 overflow-y-auto custom-scrollbar">
+                        <!-- Dynamic checkboxes -->
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-theme-heading uppercase tracking-wider mb-1">Generated Request Letter Preview</label>
+                    <textarea id="letter-preview-text" rows="10" class="w-full p-3.5 rounded-xl bg-theme-input border border-theme font-mono text-xs text-theme-heading leading-relaxed focus:outline-none focus:border-[var(--accent-primary)] custom-scrollbar" readonly></textarea>
+                </div>
+            </div>
+
+            <div class="p-4 bg-theme-input border-t border-theme flex flex-wrap gap-2 justify-end">
+                <button onclick="copyLetterToClipboard()" class="px-4 py-2 rounded-xl bg-theme-card border border-theme hover:border-[var(--accent-primary)] text-theme-heading font-bold text-xs transition flex items-center gap-1.5">
+                    <i class="fa-regular fa-copy text-[var(--accent-primary)]"></i>
+                    <span>Copy Letter</span>
+                </button>
+                <button onclick="downloadLetterTXT()" class="px-4 py-2 btn-accent font-bold text-xs rounded-xl shadow-md transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Download (.TXT)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. ADMIN AUTH MODAL -->
+    <div id="admin-auth-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div id="admin-auth-card" class="bg-theme-card rounded-3xl max-w-sm w-full p-6 shadow-2xl relative border border-theme text-center">
+            
+            <button onclick="closeAdminAuthModal()" class="absolute top-4 right-4 text-theme-muted hover:text-theme-heading w-8 h-8 rounded-full flex items-center justify-center bg-theme-input transition">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-2xl mx-auto mb-3">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <h3 class="font-display text-lg font-black text-theme-heading">Admin Passcode Required</h3>
+            <p class="text-xs text-theme-muted mt-1 leading-relaxed">
+                Enter Admin Passcode to unlock management mode and snack deletion controls.
+            </p>
+
+            <form onsubmit="handleAdminAuthSubmit(event)" class="mt-5 space-y-4">
+                <div>
+                    <label for="admin-pin-input" class="sr-only">Admin Passcode PIN</label>
+                    <input type="password" id="admin-pin-input" required placeholder="Enter Passcode" class="w-full px-4 py-2.5 text-center tracking-widest text-sm font-bold rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-amber-400 text-theme-heading placeholder:text-xs placeholder:tracking-normal placeholder:text-theme-muted">
+                    
+                    <p id="auth-error-msg" class="hidden text-xs text-rose-400 font-bold mt-2">
+                        <i class="fa-solid fa-circle-exclamation"></i> Incorrect Passcode! Try again.
+                    </p>
+                </div>
+
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2.5 border border-theme text-xs font-bold text-theme-muted hover:bg-theme-input transition rounded-xl">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black rounded-xl transition shadow-md">Unlock Admin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. CHANGE ADMIN PIN MODAL -->
+    <div id="change-pin-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-theme-card rounded-3xl max-w-sm w-full p-5 shadow-2xl relative border border-theme text-center">
+            <button onclick="closeChangePinModal()" class="absolute top-4 right-4 text-theme-muted hover:text-theme-heading w-8 h-8 rounded-full flex items-center justify-center bg-theme-input transition">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl mx-auto mb-3">
+                <i class="fa-solid fa-key"></i>
+            </div>
+
+            <h3 class="font-display text-base font-extrabold text-theme-heading">Change Admin Passcode</h3>
+            <p class="text-xs text-theme-muted mt-1 leading-relaxed">
+                Set a new passcode for securing Admin Mode on this browser.
+            </p>
+
+            <form onsubmit="handleChangePinSubmit(event)" class="mt-4 space-y-3 text-left">
+                <div>
+                    <label class="block text-[10px] font-bold text-theme-heading uppercase tracking-wider mb-1">New Admin Passcode</label>
+                    <input type="password" id="new-pin-input" required placeholder="Enter new passcode" class="w-full px-3 py-2 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-amber-400 text-xs text-theme-heading">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-theme-heading uppercase tracking-wider mb-1">Confirm Passcode</label>
+                    <input type="password" id="confirm-pin-input" required placeholder="Re-enter new passcode" class="w-full px-3 py-2 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-amber-400 text-xs text-theme-heading">
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="button" onclick="closeChangePinModal()" class="flex-1 py-2 border border-theme text-xs font-bold text-theme-muted hover:bg-theme-input transition rounded-xl">Cancel</button>
+                    <button type="submit" class="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black rounded-xl transition shadow-md">Update PIN</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. SUGGEST SNACK MODAL -->
+    <div id="suggest-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-theme-card rounded-3xl max-w-lg w-full p-6 shadow-2xl relative border border-theme">
+            
+            <button onclick="closeSuggestModal()" class="absolute top-4 right-4 text-theme-muted hover:text-theme-heading w-8 h-8 rounded-full flex items-center justify-center bg-theme-input transition">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-xl bg-theme-input text-[var(--accent-primary)] flex items-center justify-center text-lg border border-theme">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <div>
+                    <h3 class="font-display text-lg font-bold text-theme-heading">Suggest Healthy Canteen Snack</h3>
+                    <p class="text-xs text-theme-muted">Suggest a healthy & approved item to Penguin_Club canteen menu</p>
+                </div>
+            </div>
+
+            <form id="suggest-form" onsubmit="handleSuggestSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-theme-heading uppercase tracking-wider mb-1">Canteen Snack Name <span class="text-rose-500">*</span></label>
+                    <input type="text" id="food-name-input" oninput="validateDuplicateName()" required placeholder="e.g. Lemonade, Cookie, Salted Peanuts, Corn chat..." class="w-full px-3.5 py-2 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs text-theme-main">
+                    
+                    <div id="duplicate-warning" class="hidden text-xs text-rose-400 font-bold mt-2 p-2.5 rounded-xl bg-rose-950/40 border border-rose-800/80 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-400"></i>
+                        <span>This snack item already exists in the canteen menu!</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-theme-heading uppercase tracking-wider mb-1">Snack Category <span class="text-rose-500">*</span></label>
+                    <select id="food-category-input" required class="w-full px-3.5 py-2 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs text-theme-heading font-semibold">
+                        <option value="" disabled selected>Choose canteen snack category...</option>
+                        <option value="Cold Beverage">Cold Beverage</option>
+                        <option value="Quick Bites">Quick Bites</option>
+                        <option value="Bakery & Sweet">Bakery & Sweet</option>
+                        <option value="Hot Snack">Hot Snack</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-theme-heading uppercase tracking-wider mb-1">Short Description / Healthy Taste Note <span class="text-rose-500">*</span></label>
+                    <textarea id="food-desc-input" required rows="2.5" placeholder="Why is this snack healthy, delicious, and suitable for the canteen?" class="w-full px-3.5 py-2 rounded-xl bg-theme-input border border-theme focus:outline-none focus:border-[var(--accent-primary)] text-xs text-theme-main"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="button" onclick="closeSuggestModal()" class="flex-1 py-2.5 border border-theme font-semibold text-theme-muted rounded-xl hover:bg-theme-input transition text-xs">Cancel</button>
+                    <button type="submit" id="submit-dish-btn" class="flex-1 py-2.5 btn-accent font-bold rounded-xl shadow-md transition text-xs">Add Snack</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 6. MANAGE SNACKS MODAL (ADMIN UNLOCKED) -->
+    <div id="manage-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-theme-card rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl relative border border-theme overflow-hidden">
+            
+            <div class="p-5 border-b border-theme flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg border border-amber-500/30">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-lg font-bold text-theme-heading flex items-center gap-2">
+                            Manage Canteen Snacks
+                            <span class="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-md font-extrabold uppercase">Admin Unlocked</span>
+                        </h3>
+                        <p class="text-xs text-theme-muted">Keep, pin, or remove snacks from the store menu</p>
+                    </div>
+                </div>
+                <button onclick="closeManageModal()" class="text-theme-muted hover:text-theme-heading w-8 h-8 rounded-full flex items-center justify-center bg-theme-input transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Management Tools Bar -->
+            <div class="p-4 bg-theme-input border-b border-theme flex flex-wrap gap-2 justify-between items-center text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-theme-heading">Total Snacks: <span id="manage-total-count" class="text-[var(--accent-primary)]">0</span></span>
+                    <span class="text-theme-muted">|</span>
+                    <span class="font-bold text-theme-heading">Pinned: <span id="manage-pinned-count" class="text-amber-400">0</span></span>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="openChangePinModal()" class="px-2.5 py-1.5 rounded-lg bg-theme-card border border-theme text-amber-400 hover:border-amber-400 font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-key"></i> Passcode
+                    </button>
+                    <button onclick="exportSnacksJSON()" class="px-2.5 py-1.5 rounded-lg bg-theme-card border border-theme text-theme-heading hover:border-[var(--accent-primary)] font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-download"></i> Backup
+                    </button>
+                    <label class="px-2.5 py-1.5 rounded-lg bg-theme-card border border-theme text-theme-heading hover:border-[var(--accent-primary)] font-bold transition cursor-pointer flex items-center gap-1">
+                        <i class="fa-solid fa-upload"></i> Restore
+                        <input type="file" id="import-json-file" accept=".json" onchange="importSnacksJSON(event)" class="hidden">
+                    </label>
+                    <button onclick="restoreDefaultSnacks()" class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 font-bold hover:bg-rose-500/20 transition flex items-center gap-1">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Defaults
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 overflow-y-auto custom-scrollbar flex-grow space-y-2" id="manage-items-list">
+                <!-- Dynamic manage items injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. CONFIRM DELETE MODAL -->
+    <div id="confirm-delete-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-theme-card rounded-3xl max-w-sm w-full p-5 shadow-2xl relative border border-theme text-center">
+            <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xl mx-auto mb-3">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 class="font-display text-base font-extrabold text-theme-heading">Remove Snack Item?</h3>
+            <p class="text-xs text-theme-muted mt-1 leading-relaxed">
+                Are you sure you want to remove <strong id="delete-item-name" class="text-theme-heading">"Snack"</strong> from the canteen store menu?
+            </p>
+            <div class="mt-5 flex gap-2">
+                <button onclick="closeConfirmDeleteModal()" class="flex-1 py-2 rounded-xl border border-theme text-xs font-bold text-theme-muted hover:bg-theme-input transition">Cancel</button>
+                <button id="confirm-delete-btn" class="flex-1 py-2 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition shadow-md">Remove Snack</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. DETAIL & COMMENT REVIEWS MODAL -->
+    <div id="detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-theme-card rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl relative border border-theme overflow-hidden">
+            
+            <div class="relative h-48 sm:h-56 w-full bg-theme-input flex-shrink-0">
+                <img id="detail-img" src="" alt="Snack Image" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-slate-950/40 to-transparent"></div>
+                
+                <button onclick="closeDetailModal()" class="absolute top-4 right-4 bg-theme-card/80 text-theme-heading w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition border border-theme">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+
+                <div class="absolute bottom-4 left-5 right-5 text-white">
+                    <span id="detail-category" class="bg-[var(--accent-primary)] text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">Category</span>
+                    <h2 id="detail-title" class="font-display text-xl sm:text-2xl font-black mt-1 text-white leading-tight">Snack Title</h2>
+                </div>
+            </div>
+
+            <div class="p-5 overflow-y-auto custom-scrollbar flex-grow space-y-5">
+                
+                <!-- Metrics -->
+                <div class="flex items-center justify-between gap-3 border-b border-theme pb-3 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-star text-[var(--accent-gold)] text-base"></i>
+                        <span id="detail-rating-num" class="font-bold text-theme-heading text-lg">4.8</span>
+                        <span id="detail-votes-count" class="text-xs text-theme-muted font-semibold">(0 votes)</span>
+                    </div>
+
+                    <button id="detail-upvote-btn" onclick="handleUpvoteInModal()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold px-3 py-1 rounded-xl text-xs flex items-center gap-1.5 border border-rose-500/30 transition active:scale-95">
+                        <i class="fa-solid fa-heart text-rose-400"></i>
+                        <span id="detail-upvotes-count">0 Upvotes</span>
+                    </button>
+                </div>
+
+                <p id="detail-desc" class="text-theme-main text-xs leading-relaxed bg-theme-input p-3.5 rounded-xl border border-theme">
+                    Description goes here...
+                </p>
+
+                <!-- Rating Form -->
+                <div class="bg-theme-input p-4 rounded-2xl border border-theme">
+                    <h4 class="font-display font-bold text-theme-heading text-xs mb-2.5 flex items-center gap-1.5">
+                        <i class="fa-regular fa-comment-dots text-[var(--accent-primary)]"></i>
+                        <span>Leave a Canteen Snack Rating & Review</span>
+                    </h4>
+
+                    <form id="comment-form" onsubmit="handleCommentSubmit(event)" class="space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <input type="text" id="comment-author" placeholder="Your Name or Student Alias (Optional)" class="px-3 py-1.5 rounded-xl bg-theme-card border border-theme text-xs focus:outline-none focus:border-[var(--accent-primary)] text-theme-main sm:w-1/2">
+                            
+                            <div class="flex items-center gap-1 bg-theme-card px-3 py-1.5 rounded-xl border border-theme">
+                                <span class="text-[10px] font-bold text-theme-muted mr-1">Rating:</span>
+                                <div class="flex text-slate-500 gap-1" id="star-rating-selector">
+                                    <i class="fa-solid fa-star cursor-pointer hover:text-amber-400 transition text-sm" onclick="setSelectRating(1)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer hover:text-amber-400 transition text-sm" onclick="setSelectRating(2)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer hover:text-amber-400 transition text-sm" onclick="setSelectRating(3)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer hover:text-amber-400 transition text-sm" onclick="setSelectRating(4)"></i>
+                                    <i class="fa-solid fa-star cursor-pointer hover:text-amber-400 transition text-sm" onclick="setSelectRating(5)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <textarea id="comment-text" required rows="2" placeholder="How was the taste, freshness, and quality?" class="w-full px-3 py-1.5 rounded-xl bg-theme-card border border-theme text-xs focus:outline-none focus:border-[var(--accent-primary)] text-theme-main"></textarea>
+
+                        <button type="submit" class="w-full py-2 btn-accent font-bold rounded-xl text-xs shadow-md transition">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Comment Feed -->
+                <div>
+                    <h4 class="font-display font-bold text-theme-heading text-sm mb-2">Canteen Reviews (<span id="comments-count">0</span>)</h4>
+                    <div id="comments-list" class="space-y-2.5">
+                        <!-- Injected Comments -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-theme-card border border-theme text-theme-heading px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 transform translate-y-24 opacity-0 transition-all duration-300 z-50 text-xs font-semibold">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-[var(--accent-primary)]"></i>
+        <span id="toast-msg">Action completed!</span>
+    </div>
+
+    <script>
+        // CANTEEN SNACKS INITIAL SEED DATA (EXACT 5 PRE-SET HEALTHY & SPICY ITEMS)
+        const INITIAL_CANTEEN_SNACKS = [
+            {
+                id: 'cookie-1',
+                name: 'Oatmeal Choc Cookie',
+                category: 'Bakery & Sweet',
+                description: 'Crispy, freshly baked whole grain cookie loaded with rich chocolate chips and warm vanilla oats.',
+                img: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=800&q=80',
+                upvotes: 28,
+                pinned: false,
+                badge: 'Freshly Baked',
+                ratings: [5, 5, 4, 5, 5],
+                comments: [
+                    { author: 'Sam P.', rating: 5, text: 'Super crunchy and not overly sweet! Perfect with afternoon tea.', date: '1 day ago' }
+                ]
+            },
+            {
+                id: 'peanuts-2',
+                name: 'Salted Roasted Peanuts',
+                category: 'Quick Bites',
+                description: 'Crunchy golden roasted peanuts seasoned with Himalayan pink salt and mild campus spice mixture.',
+                img: 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=800&q=80',
+                upvotes: 35,
+                pinned: false,
+                badge: 'High Protein',
+                ratings: [5, 4, 5, 5, 4],
+                comments: [
+                    { author: 'Priya M.', rating: 5, text: 'Best study snack ever, keeps you full during long lectures!', date: '2 days ago' }
+                ]
+            },
+            {
+                id: 'fruitsalad-3',
+                name: 'Fresh Rainbow Fruit Salad',
+                category: 'Quick Bites',
+                description: 'Vibrant bowl filled with fresh strawberries, kiwi, blueberries, mango, and a hint of lime mint syrup.',
+                img: 'https://images.unsplash.com/photo-1519996529931-28324d5a630e?auto=format&fit=crop&w=800&q=80',
+                upvotes: 46,
+                pinned: false,
+                badge: '100% Fresh',
+                ratings: [5, 5, 5, 4, 5],
+                comments: [
+                    { author: 'Ananya K.', rating: 5, text: 'So juicy and refreshing! Really love the mint lime twist.', date: 'Today' }
+                ]
+            },
+            {
+                id: 'custard-4',
+                name: 'Creamy Fruit Custard',
+                category: 'Bakery & Sweet',
+                description: 'Smooth and chilled vanilla custard loaded with juicy fresh berries, banana slices, and pomegranate.',
+                img: 'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?auto=format&fit=crop&w=800&q=80',
+                upvotes: 22,
+                pinned: false,
+                badge: 'Chilled Dessert',
+                ratings: [5, 4, 5, 4],
+                comments: [
+                    { author: 'Rahul S.', rating: 4, text: 'Smooth and creamy texture. Perfect sweet treat after canteen lunch.', date: '3 days ago' }
+                ]
+            },
+            {
+                id: 'cornchat-5',
+                name: 'Spicy Zesty Corn Chat',
+                category: 'Hot Snack',
+                description: 'Warm sweet corn kernels tossed with lemon juice, green chillies, chaat masala, and fresh cilantro.',
+                img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=800&q=80',
+                upvotes: 40,
+                pinned: false,
+                badge: 'Spicy & Tangy',
+                ratings: [5, 5, 5, 5, 4],
+                comments: [
+                    { author: 'Dev R.', rating: 5, text: 'Super spicy and tangy! Exactly what we needed in the canteen menu.', date: 'Yesterday' }
+                ]
+            }
+        ];
+
+        const CATEGORY_DEFAULT_IMAGES = {
+            "Cold Beverage": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=80",
+            "Quick Bites": "https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=800&q=80",
+            "Bakery & Sweet": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=800&q=80",
+            "Hot Snack": "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=800&q=80"
+        };
+
+        const STORAGE_KEY = 'penguin_club_canteen_foods_v7_updated_items';
+
+        // Application State
+        let foods = [];
+        let activeTab = 'top'; // 'top', 'random', 'all'
+        let activeFoodIdModal = null;
+        let selectedStarRating = 5;
+        let isAdminUnlocked = false;
+        let pendingDeleteId = null;
+        let adminPin = "Penguin_from_antartica";
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadThemePreference();
+            loadAdminPin();
+            loadFoodsFromStorage();
+            updateAdminButtonUI();
+            setActiveTab('top');
+            
+            // Trigger Announcement Notice Modal on page open if not dismissed before or first visit
+            setTimeout(() => {
+                openNoticeModal();
+            }, 300);
+        });
+
+        function loadAdminPin() {
+            const savedPin = localStorage.getItem('penguin_club_admin_pin_v2');
+            if (savedPin) {
+                adminPin = savedPin;
+            } else {
+                adminPin = "Penguin_from_antartica";
+                localStorage.setItem('penguin_club_admin_pin_v2', adminPin);
+            }
+        }
+
+        function changeColorScheme(themeKey) {
+            document.documentElement.setAttribute('data-theme', themeKey);
+            localStorage.setItem('penguin_club_canteen_theme', themeKey);
+            
+            const desktopSel = document.getElementById('theme-selector');
+            const mobileSel = document.getElementById('theme-selector-mobile');
+            if (desktopSel) desktopSel.value = themeKey;
+            if (mobileSel) mobileSel.value = themeKey;
+
+            showToast(`Theme changed to: ${themeKey}`);
+        }
+
+        function loadThemePreference() {
+            const savedTheme = localStorage.getItem('penguin_club_canteen_theme') || 'github-monospace-vandice';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            
+            const desktopSel = document.getElementById('theme-selector');
+            const mobileSel = document.getElementById('theme-selector-mobile');
+            if (desktopSel) desktopSel.value = savedTheme;
+            if (mobileSel) mobileSel.value = savedTheme;
+        }
+
+        function loadFoodsFromStorage() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    foods = JSON.parse(stored);
+                } catch (e) {
+                    foods = [...INITIAL_CANTEEN_SNACKS];
+                }
+            } else {
+                foods = [...INITIAL_CANTEEN_SNACKS];
+                saveFoodsToStorage();
+            }
+        }
+
+        function saveFoodsToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(foods));
+        }
+
+        /* NOTICE MODAL FUNCTIONS */
+        function openNoticeModal() {
+            document.getElementById('notice-modal').classList.remove('hidden');
+        }
+
+        function closeNoticeModal() {
+            document.getElementById('notice-modal').classList.add('hidden');
+        }
+
+        /* CANTEEN REQUEST LETTER GENERATOR */
+        function openLetterModal() {
+            populateLetterCheckboxes();
+            generateLetterText();
+            document.getElementById('letter-modal').classList.remove('hidden');
+        }
+
+        function closeLetterModal() {
+            document.getElementById('letter-modal').classList.add('hidden');
+        }
+
+        function populateLetterCheckboxes() {
+            const container = document.getElementById('letter-snack-checkboxes');
+            container.innerHTML = foods.map((f, i) => `
+                <label class="inline-flex items-center gap-1.5 bg-theme-card px-2.5 py-1 rounded-lg border border-theme text-xs font-semibold cursor-pointer">
+                    <input type="checkbox" value="${f.name}" ${i < 4 ? 'checked' : ''} onchange="generateLetterText()" class="rounded text-[var(--accent-primary)] focus:ring-0">
+                    <span class="text-theme-heading">${f.name}</span>
+                </label>
+            `).join('');
+        }
+
+        function generateLetterText() {
+            const groupName = document.getElementById('letter-group-input').value.trim() || 'Penguin_Club Students';
+            const managerName = document.getElementById('letter-manager-input').value.trim() || 'Canteen Manager';
+
+            const checkedBoxes = document.querySelectorAll('#letter-snack-checkboxes input[type="checkbox"]:checked');
+            const selectedSnacks = Array.from(checkedBoxes).map(cb => cb.value);
+
+            let snacksFormatted = selectedSnacks.length > 0 
+                ? selectedSnacks.map(s => `  • ${s}`).join('\n')
+                : "  • Healthy Lemonade / Fresh Citrus Juice\n  • Salted Spicy Peanuts & Corn Chaat\n  • Whole Grain Cookies & Roasted Khakhra";
+
+            const letterBody = 
+`To,
+The ${managerName},
+Campus Canteen,
+
+Subject: Formal Student Request for Addition of Healthy & Spicy Snack Items
+
+Respected Sir/Madam,
+
+We, the undersigned students representing "${groupName}", are writing this request letter to suggest adding new, highly requested healthy snack options to our campus canteen menu.
+
+Based on student feedback and votes gathered on the Penguin_Club Food Store portal, the following healthy yet appetizing snacks are heavily supported by students:
+
+${snacksFormatted}
+
+Key Reasons & Guidelines:
+1. Health & Compliance: These items are nutritious, made from healthy whole ingredients (fresh fruits, whole grains, corn, fresh lemons), and fully comply with campus food standards (will not be banned).
+2. Zesty & Spicy Flavors: They deliver the mouth-watering tangy, spicy, and roasted flavors that students crave during study breaks.
+3. Quality & Engagement: Students are actively reviewing and supporting these items on our campus portal.
+
+We request you to kindly consider introducing these healthy options at the earliest. We are confident they will be popular and beneficial for all campus students.
+
+Thank you for your time and continuous service to our campus community!
+
+Yours sincerely,
+${groupName}
+Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+Penguin_Club Food Store Portal`;
+
+            document.getElementById('letter-preview-text').value = letterBody;
+        }
+
+        function copyLetterToClipboard() {
+            const text = document.getElementById('letter-preview-text').value;
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            try {
+                document.execCommand('copy');
+                showToast("Request letter copied to clipboard!");
+            } catch (err) {
+                showToast("Failed to copy automatically", "error");
+            }
+            document.body.removeChild(temp);
+        }
+
+        function downloadLetterTXT() {
+            const text = document.getElementById('letter-preview-text').value;
+            const element = document.createElement('a');
+            const file = new Blob([text], {type: 'text/plain'});
+            element.href = URL.createObjectURL(file);
+            element.download = "Canteen_Snack_Request_Letter.txt";
+            document.body.appendChild(element);
+            element.click();
+            element.remove();
+            showToast("Downloaded Canteen_Snack_Request_Letter.txt");
+        }
+
+        /* ADMIN SECURITY MANAGEMENT LOGIC */
+        function handleAdminToggleClick() {
+            if (isAdminUnlocked) {
+                isAdminUnlocked = false;
+                updateAdminButtonUI();
+                renderCurrentView();
+                showToast("Admin Mode locked.");
+            } else {
+                openAdminAuthModal();
+            }
+        }
+
+        function openAdminAuthModal() {
+            document.getElementById('admin-pin-input').value = '';
+            document.getElementById('auth-error-msg').classList.add('hidden');
+            document.getElementById('admin-auth-modal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('admin-pin-input').focus(), 100);
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+        }
+
+        function handleAdminAuthSubmit(e) {
+            e.preventDefault();
+            const inputPin = document.getElementById('admin-pin-input').value.trim();
+
+            if (inputPin === adminPin || inputPin === "Penguin_from_antartica") {
+                isAdminUnlocked = true;
+                closeAdminAuthModal();
+                updateAdminButtonUI();
+                renderCurrentView();
+                showToast("Admin Mode Unlocked! 🔓");
+            } else {
+                const card = document.getElementById('admin-auth-card');
+                const err = document.getElementById('auth-error-msg');
+                err.classList.remove('hidden');
+                
+                card.classList.remove('shake-animation');
+                void card.offsetWidth;
+                card.classList.add('shake-animation');
+            }
+        }
+
+        function updateAdminButtonUI() {
+            const btn = document.getElementById('admin-toggle-btn');
+            const text = document.getElementById('admin-mode-text');
+            const icon = document.getElementById('admin-lock-icon');
+
+            if (isAdminUnlocked) {
+                btn.className = "bg-amber-500/10 border-amber-500/50 text-amber-400 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 border transition shadow-sm";
+                text.textContent = "Lock Admin";
+                icon.className = "fa-solid fa-lock-open text-amber-400";
+            } else {
+                btn.className = "bg-theme-input hover:border-[var(--accent-coral)] text-theme-heading font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 border border-theme transition";
+                text.textContent = "Admin Mode";
+                icon.className = "fa-solid fa-lock text-amber-400";
+            }
+        }
+
+        function requestManageModalAccess() {
+            if (isAdminUnlocked) {
+                openManageModal();
+            } else {
+                showToast("Admin Passcode required to manage snacks!", "warning");
+                openAdminAuthModal();
+            }
+        }
+
+        function openChangePinModal() {
+            document.getElementById('new-pin-input').value = '';
+            document.getElementById('confirm-pin-input').value = '';
+            document.getElementById('change-pin-modal').classList.remove('hidden');
+        }
+
+        function closeChangePinModal() {
+            document.getElementById('change-pin-modal').classList.add('hidden');
+        }
+
+        function handleChangePinSubmit(e) {
+            e.preventDefault();
+            const p1 = document.getElementById('new-pin-input').value.trim();
+            const p2 = document.getElementById('confirm-pin-input').value.trim();
+
+            if (p1.length < 3) {
+                showToast("Passcode must be at least 3 characters!", "error");
+                return;
+            }
+
+            if (p1 !== p2) {
+                showToast("Passcodes do not match!", "error");
+                return;
+            }
+
+            adminPin = p1;
+            localStorage.setItem('penguin_club_admin_pin_v2', p1);
+            closeChangePinModal();
+            showToast("Admin Passcode updated successfully!");
+        }
+
+        function calculateAverageRating(ratingsArr) {
+            if (!ratingsArr || ratingsArr.length === 0) return "0.0";
+            const sum = ratingsArr.reduce((a, b) => a + b, 0);
+            return (sum / ratingsArr.length).toFixed(1);
+        }
+
+        function setActiveTab(tab) {
+            activeTab = tab;
+
+            const tabs = {
+                'top': document.getElementById('tab-top'),
+                'random': document.getElementById('tab-random'),
+                'all': document.getElementById('tab-all')
+            };
+
+            Object.keys(tabs).forEach(k => {
+                if (k === tab) {
+                    tabs[k].className = "px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 btn-accent border border-transparent shadow-md";
+                } else {
+                    tabs[k].className = "px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-theme-input text-theme-main hover:border-[var(--accent-primary)] border border-theme";
+                }
+            });
+
+            const titleEl = document.getElementById('section-title');
+            const subTitleEl = document.getElementById('section-subtitle');
+            const shuffleBtn = document.getElementById('shuffle-btn');
+            const sortWrapper = document.getElementById('sort-wrapper');
+
+            if (tab === 'top') {
+                titleEl.innerHTML = `<i class="fa-solid fa-trophy text-[var(--accent-gold)]"></i> Most Loved Canteen Snacks`;
+                subTitleEl.textContent = "Healthy canteen snacks ranked by student ratings and upvotes!";
+                shuffleBtn.classList.add('hidden');
+                sortWrapper.classList.add('hidden');
+            } else if (tab === 'random') {
+                titleEl.innerHTML = `<i class="fa-solid fa-shuffle text-[var(--accent-coral)]"></i> Snack Roulette / Random Picks`;
+                subTitleEl.textContent = "Not sure what to eat during break? Spin for random suggestions!";
+                shuffleBtn.classList.remove('hidden');
+                sortWrapper.classList.add('hidden');
+            } else {
+                titleEl.innerHTML = `<i class="fa-solid fa-list-check text-[var(--accent-primary)]"></i> All Canteen Snacks`;
+                subTitleEl.textContent = "Browse full snack list with search & filters.";
+                shuffleBtn.classList.add('hidden');
+                sortWrapper.classList.remove('hidden');
+            }
+
+            renderCurrentView();
+        }
+
+        function handleFilterChange() {
+            renderCurrentView();
+        }
+
+        function reshuffleRandomList() {
+            renderCurrentView();
+            showToast("Shuffled canteen snacks! 🎲");
+        }
+
+        function renderCurrentView() {
+            const grid = document.getElementById('food-grid');
+            const emptyState = document.getElementById('empty-state');
+            const searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
+            const categoryQuery = document.getElementById('category-filter').value;
+            const sortOption = document.getElementById('sort-option').value;
+
+            let result = foods.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchQuery) ||
+                                     item.description.toLowerCase().includes(searchQuery) ||
+                                     item.category.toLowerCase().includes(searchQuery);
+                const matchesCategory = (categoryQuery === 'ALL') || (item.category === categoryQuery);
+                return matchesSearch && matchesCategory;
+            });
+
+            if (activeTab === 'top') {
+                result.sort((a, b) => {
+                    const avgA = parseFloat(calculateAverageRating(a.ratings));
+                    const avgB = parseFloat(calculateAverageRating(b.ratings));
+                    if (avgB !== avgA) return avgB - avgA;
+                    return (b.upvotes || 0) - (a.upvotes || 0);
+                });
+            } else if (activeTab === 'random') {
+                result = [...result].sort(() => Math.random() - 0.5);
+            } else {
+                if (sortOption === 'highest') {
+                    result.sort((a, b) => parseFloat(calculateAverageRating(b.ratings)) - parseFloat(calculateAverageRating(a.ratings)));
+                } else if (sortOption === 'votes') {
+                    result.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+                } else if (sortOption === 'newest') {
+                    result.reverse();
+                } else if (sortOption === 'name') {
+                    result.sort((a, b) => a.name.localeCompare(b.name));
+                }
+            }
+
+            if (result.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = result.map((item, index) => renderFoodCard(item, index)).join('');
+        }
+
+        function renderFoodCard(item, index) {
+            const avgRating = calculateAverageRating(item.ratings);
+            const votesCount = item.ratings ? item.ratings.length : 0;
+            const commentsCount = item.comments ? item.comments.length : 0;
+            const upvotes = item.upvotes || 0;
+
+            let leaderboardBadge = '';
+            if (activeTab === 'top') {
+                if (index === 0) {
+                    leaderboardBadge = `<span class="absolute top-2.5 left-2.5 bg-amber-500 text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-md shadow-md z-10 flex items-center gap-1"><i class="fa-solid fa-crown"></i> #1 CANTEEN FAVORITE</span>`;
+                } else if (index === 1) {
+                    leaderboardBadge = `<span class="absolute top-2.5 left-2.5 bg-slate-300 text-slate-950 font-black text-[10px] px-2.5 py-0.5 rounded-md shadow-md z-10">#2 RUNNER UP</span>`;
+                } else if (index === 2) {
+                    leaderboardBadge = `<span class="absolute top-2.5 left-2.5 bg-amber-700 text-white font-black text-[10px] px-2.5 py-0.5 rounded-md shadow-md z-10">#3 TOP CHOICE</span>`;
+                }
+            }
+
+            const badgeTag = item.badge ? `<span class="absolute top-2.5 right-2.5 bg-slate-950/80 text-emerald-400 border border-emerald-400/40 font-bold text-[10px] px-2 py-0.5 rounded-md backdrop-blur-sm z-10 flex items-center gap-1"><i class="fa-solid fa-leaf text-emerald-400"></i> ${item.badge}</span>` : '';
+
+            const removeBtnHtml = isAdminUnlocked ? `
+                <button onclick="promptDeleteFood('${item.id}', event)" class="bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white font-bold px-2 py-1 rounded-lg border border-rose-500/40 transition flex items-center gap-1 text-[11px]" title="Remove this snack">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Remove</span>
+                </button>
+            ` : '';
+
+            const animClass = activeTab === 'random' ? 'card-shuffle-anim' : '';
+
+            return `
+            <div class="bg-theme-card rounded-2xl overflow-hidden border border-theme shadow-sm hover:border-[var(--accent-primary)] transition-all duration-300 flex flex-col ${animClass}">
+                <div class="relative h-48 w-full overflow-hidden bg-theme-input">
+                    ${leaderboardBadge}
+                    ${badgeTag}
+                    <img src="${item.img}" alt="${item.name}" onerror="this.src='${CATEGORY_DEFAULT_IMAGES[item.category] || CATEGORY_DEFAULT_IMAGES['Quick Bites']}'" class="w-full h-full object-cover">
+                    <div class="absolute bottom-2.5 left-2.5 bg-slate-950/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-md border border-white/10">
+                        ${item.category}
+                    </div>
+                </div>
+
+                <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="font-display text-base font-extrabold text-theme-heading line-clamp-1">${item.name}</h3>
+                            ${removeBtnHtml}
+                        </div>
+                        <p class="text-theme-muted text-xs line-clamp-2 leading-relaxed mt-1">${item.description}</p>
+                    </div>
+
+                    <div class="pt-2 border-t border-theme flex items-center justify-between gap-1">
+                        <div class="flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[var(--accent-gold)] text-xs"></i>
+                            <span class="font-bold text-theme-heading text-xs">${avgRating}</span>
+                            <span class="text-[10px] text-theme-muted">(${votesCount})</span>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <button onclick="handleUpvote('${item.id}', event)" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold px-2 py-1 rounded-lg border border-rose-500/30 transition flex items-center gap-1">
+                                <i class="fa-solid fa-heart text-rose-400"></i>
+                                <span>${upvotes}</span>
+                            </button>
+
+                            <button onclick="openDetailModal('${item.id}')" class="bg-theme-input hover:border-[var(--accent-primary)] text-theme-heading text-xs font-bold px-2.5 py-1 rounded-lg border border-theme transition flex items-center gap-1">
+                                <i class="fa-regular fa-comment text-[var(--accent-primary)]"></i>
+                                <span>${commentsCount}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        function normalizeString(str) {
+            return str.trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function validateDuplicateName() {
+            const rawName = document.getElementById('food-name-input').value;
+            const normalizedInput = normalizeString(rawName);
+            const warningEl = document.getElementById('duplicate-warning');
+            const submitBtn = document.getElementById('submit-dish-btn');
+
+            if (!normalizedInput) {
+                warningEl.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                return true;
+            }
+
+            const isDuplicate = foods.some(item => normalizeString(item.name) === normalizedInput);
+
+            if (isDuplicate) {
+                warningEl.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                return false;
+            } else {
+                warningEl.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                return true;
+            }
+        }
+
+        function openSuggestModal() {
+            document.getElementById('suggest-form').reset();
+            document.getElementById('duplicate-warning').classList.add('hidden');
+            const submitBtn = document.getElementById('submit-dish-btn');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            document.getElementById('suggest-modal').classList.remove('hidden');
+        }
+
+        function closeSuggestModal() {
+            document.getElementById('suggest-modal').classList.add('hidden');
+        }
+
+        function handleSuggestSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('food-name-input').value.trim();
+            const category = document.getElementById('food-category-input').value;
+            const desc = document.getElementById('food-desc-input').value.trim();
+
+            if (!validateDuplicateName()) {
+                showToast("Duplicate snack item name!", "error");
+                return;
+            }
+
+            const defaultImg = CATEGORY_DEFAULT_IMAGES[category] || CATEGORY_DEFAULT_IMAGES['Quick Bites'];
+
+            const newFood = {
+                id: 'canteen-' + Date.now(),
+                name: name,
+                category: category,
+                description: desc,
+                img: defaultImg,
+                upvotes: 1,
+                pinned: false,
+                badge: "Student Approved",
+                ratings: [5],
+                comments: []
+            };
+
+            foods.unshift(newFood);
+            saveFoodsToStorage();
+            closeSuggestModal();
+            renderCurrentView();
+
+            showToast(`Added "${name}" to canteen menu!`);
+        }
+
+        function promptDeleteFood(foodId, e) {
+            if (e) e.stopPropagation();
+            if (!isAdminUnlocked) {
+                showToast("Admin Passcode required to remove items!", "warning");
+                openAdminAuthModal();
+                return;
+            }
+
+            const item = foods.find(f => f.id === foodId);
+            if (!item) return;
+
+            pendingDeleteId = foodId;
+            document.getElementById('delete-item-name').textContent = `"${item.name}"`;
+            
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            confirmBtn.onclick = executeDeleteFood;
+
+            document.getElementById('confirm-delete-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmDeleteModal() {
+            document.getElementById('confirm-delete-modal').classList.add('hidden');
+            pendingDeleteId = null;
+        }
+
+        function executeDeleteFood() {
+            if (!pendingDeleteId || !isAdminUnlocked) return;
+
+            const item = foods.find(f => f.id === pendingDeleteId);
+            const itemName = item ? item.name : 'Snack';
+
+            foods = foods.filter(f => f.id !== pendingDeleteId);
+            saveFoodsToStorage();
+            closeConfirmDeleteModal();
+
+            renderCurrentView();
+            renderManageItemsList();
+
+            showToast(`Removed "${itemName}" from canteen store.`);
+        }
+
+        function openManageModal() {
+            if (!isAdminUnlocked) {
+                openAdminAuthModal();
+                return;
+            }
+            renderManageItemsList();
+            document.getElementById('manage-modal').classList.remove('hidden');
+        }
+
+        function closeManageModal() {
+            document.getElementById('manage-modal').classList.add('hidden');
+        }
+
+        function renderManageItemsList() {
+            const listContainer = document.getElementById('manage-items-list');
+            document.getElementById('manage-total-count').textContent = foods.length;
+            
+            const pinnedCount = foods.filter(f => f.pinned).length;
+            document.getElementById('manage-pinned-count').textContent = pinnedCount;
+
+            if (foods.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-8 text-theme-muted text-xs">
+                        No snacks currently in the menu. Click "Reset Defaults" above to load initial canteen snacks!
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = foods.map(item => `
+                <div class="flex items-center justify-between gap-3 p-3 bg-theme-input rounded-xl border border-theme">
+                    <div class="flex items-center gap-3">
+                        <img src="${item.img}" alt="${item.name}" onerror="this.src='${CATEGORY_DEFAULT_IMAGES[item.category]}'" class="w-10 h-10 rounded-lg object-cover">
+                        <div>
+                            <h4 class="font-bold text-xs text-theme-heading flex items-center gap-1.5">
+                                ${item.name}
+                                ${item.pinned ? '<i class="fa-solid fa-thumbtack text-amber-400 text-[10px]"></i>' : ''}
+                            </h4>
+                            <span class="text-[10px] text-theme-muted">${item.category} • ${calculateAverageRating(item.ratings)} ★ (${item.upvotes || 0} votes)</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="togglePinFood('${item.id}')" class="px-2.5 py-1 rounded-lg ${item.pinned ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-theme-card text-theme-muted border-theme hover:text-theme-heading'} border text-xs font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-thumbtack"></i>
+                            <span>${item.pinned ? 'Pinned' : 'Keep / Pin'}</span>
+                        </button>
+
+                        <button onclick="promptDeleteFood('${item.id}')" class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/40 text-xs font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>Remove</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function togglePinFood(foodId) {
+            if (!isAdminUnlocked) return;
+            const idx = foods.findIndex(f => f.id === foodId);
+            if (idx === -1) return;
+
+            foods[idx].pinned = !foods[idx].pinned;
+            saveFoodsToStorage();
+            renderManageItemsList();
+            renderCurrentView();
+
+            showToast(foods[idx].pinned ? `Pinned "${foods[idx].name}"` : `Unpinned "${foods[idx].name}"`);
+        }
+
+        function restoreDefaultSnacks() {
+            if (!isAdminUnlocked) return;
+            foods = [...INITIAL_CANTEEN_SNACKS];
+            saveFoodsToStorage();
+            renderCurrentView();
+            renderManageItemsList();
+            showToast("Restored default canteen snacks!");
+        }
+
+        function exportSnacksJSON() {
+            if (!isAdminUnlocked) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(foods, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "Penguin_Club_Canteen_Snacks.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Exported JSON backup!");
+        }
+
+        function importSnacksJSON(event) {
+            if (!isAdminUnlocked) return;
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported) && imported.length > 0) {
+                        foods = imported;
+                        saveFoodsToStorage();
+                        renderCurrentView();
+                        renderManageItemsList();
+                        showToast(`Successfully imported ${imported.length} canteen snacks!`);
+                    } else {
+                        showToast("Invalid JSON file format!", "error");
+                    }
+                } catch (err) {
+                    showToast("Error reading JSON file!", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleUpvote(foodId, e) {
+            if (e) e.stopPropagation();
+            const idx = foods.findIndex(f => f.id === foodId);
+            if (idx === -1) return;
+
+            foods[idx].upvotes = (foods[idx].upvotes || 0) + 1;
+            saveFoodsToStorage();
+            renderCurrentView();
+
+            showToast(`Upvoted ${foods[idx].name}! ❤️`);
+        }
+
+        function handleUpvoteInModal() {
+            if (!activeFoodIdModal) return;
+            handleUpvote(activeFoodIdModal, null);
+
+            const item = foods.find(f => f.id === activeFoodIdModal);
+            if (item) {
+                document.getElementById('detail-upvotes-count').textContent = `${item.upvotes || 0} Upvotes`;
+            }
+        }
+
+        function openDetailModal(foodId) {
+            activeFoodIdModal = foodId;
+            const item = foods.find(f => f.id === foodId);
+            if (!item) return;
+
+            document.getElementById('detail-title').textContent = item.name;
+            document.getElementById('detail-category').textContent = item.category;
+            document.getElementById('detail-img').src = item.img;
+            document.getElementById('detail-img').onerror = function() {
+                this.src = CATEGORY_DEFAULT_IMAGES[item.category] || CATEGORY_DEFAULT_IMAGES['Quick Bites'];
+            };
+            document.getElementById('detail-desc').textContent = item.description;
+            document.getElementById('detail-rating-num').textContent = calculateAverageRating(item.ratings);
+            document.getElementById('detail-votes-count').textContent = `(${item.ratings ? item.ratings.length : 0} votes)`;
+            document.getElementById('detail-upvotes-count').textContent = `${item.upvotes || 0} Upvotes`;
+
+            setSelectRating(5);
+            document.getElementById('comment-form').reset();
+            renderCommentsList(item.comments || []);
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+            activeFoodIdModal = null;
+        }
+
+        function setSelectRating(val) {
+            selectedStarRating = val;
+            const stars = document.querySelectorAll('#star-rating-selector i');
+            stars.forEach((star, idx) => {
+                if (idx < val) {
+                    star.className = "fa-solid fa-star text-[var(--accent-gold)] cursor-pointer transition text-sm";
+                } else {
+                    star.className = "fa-solid fa-star text-slate-600 cursor-pointer hover:text-amber-300 transition text-sm";
+                }
+            });
+        }
+
+        function renderCommentsList(comments) {
+            const listContainer = document.getElementById('comments-list');
+            document.getElementById('comments-count').textContent = comments.length;
+
+            if (comments.length === 0) {
+                listContainer.innerHTML = `
+                    <p class="text-xs text-theme-muted italic py-2 text-center">No canteen reviews yet. Be the first student to comment!</p>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = comments.map(c => `
+                <div class="p-3 bg-theme-input rounded-xl border border-theme">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="font-bold text-xs text-theme-heading">${c.author || 'Canteen Student'}</span>
+                        <div class="flex text-[var(--accent-gold)] text-[10px]">
+                            ${Array.from({length: 5}, (_, i) => `<i class="${i < c.rating ? 'fa-solid' : 'fa-regular'} fa-star"></i>`).join('')}
+                        </div>
+                    </div>
+                    <p class="text-xs text-theme-main leading-normal">${c.text}</p>
+                    <span class="text-[10px] text-theme-muted mt-1 block">${c.date || 'Just now'}</span>
+                </div>
+            `).join('');
+        }
+
+        function handleCommentSubmit(e) {
+            e.preventDefault();
+            if (!activeFoodIdModal) return;
+
+            const authorInput = document.getElementById('comment-author').value.trim();
+            const textInput = document.getElementById('comment-text').value.trim();
+
+            const idx = foods.findIndex(f => f.id === activeFoodIdModal);
+            if (idx === -1) return;
+
+            const newComment = {
+                author: authorInput || 'Canteen Student',
+                rating: selectedStarRating,
+                text: textInput,
+                date: 'Just now'
+            };
+
+            if (!foods[idx].ratings) foods[idx].ratings = [];
+            if (!foods[idx].comments) foods[idx].comments = [];
+
+            foods[idx].ratings.push(selectedStarRating);
+            foods[idx].comments.unshift(newComment);
+
+            saveFoodsToStorage();
+
+            document.getElementById('detail-rating-num').textContent = calculateAverageRating(foods[idx].ratings);
+            document.getElementById('detail-votes-count').textContent = `(${foods[idx].ratings.length} votes)`;
+            renderCommentsList(foods[idx].comments);
+
+            document.getElementById('comment-text').value = '';
+            document.getElementById('comment-author').value = '';
+            setSelectRating(5);
+
+            renderCurrentView();
+            showToast("Snack review posted!");
+        }
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = msg;
+            if (type === "error") {
+                toastIcon.className = "fa-solid fa-circle-xmark text-rose-400";
+            } else if (type === "warning") {
+                toastIcon.className = "fa-solid fa-triangle-exclamation text-amber-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-[var(--accent-primary)]";
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 2500);
+        }
+    </script>
+</body>
 </html>
