@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Penguin_Club Food store</title>
+  <title>Penguin_Club Food Store</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,6 +11,10 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Firebase SDKs (Compat for simple CDN client usage) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
@@ -114,98 +118,97 @@
     }
   </style>
 </head>
-<body class="theme-github-monospace-vandice min-h-screen flex flex-col antialiased">
+<body class="theme-github-monospace-vandice min-h-screen flex flex-col antialiased overflow-x-hidden">
 
-  <!-- Top Navigation Header -->
   <header class="border-b border-custom bg-custom-card sticky top-0 z-40 backdrop-blur-md bg-opacity-90">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-purple-600 flex items-center justify-center text-2xl shadow-lg shadow-emerald-500/20">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-0 sm:h-16 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl shadow-lg shadow-emerald-500/20 shrink-0">
           🐧
         </div>
         <div>
-          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            Penguin_Club <span class="text-xs px-2 py-0.5 rounded-full border border-custom text-accent bg-black/30">Food Store</span>
+          <h1 class="text-base sm:text-xl font-bold tracking-tight text-white flex items-center gap-1.5 sm:gap-2">
+            Penguin_Club <span class="text-[10px] sm:text-xs px-1.5 py-0.5 rounded-full border border-custom text-accent bg-black/30">Food Store</span>
           </h1>
           <p class="text-xs text-custom-muted hidden sm:block">Real-Time Campus Canteen Suggestion Hub</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-3">
+      <div class="flex items-center gap-1.5 sm:gap-3 ml-auto">
         <!-- Live Sync Status -->
-        <div id="sync-badge" class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-custom bg-black/30">
+        <div id="sync-badge" class="flex items-center gap-1.5 text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-full border border-custom bg-black/30">
           <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse" id="sync-dot"></span>
-          <span id="sync-text" class="text-custom-muted text-xs">Connecting...</span>
+          <span id="sync-text" class="text-custom-muted hidden xs:inline text-xs">Connecting...</span>
         </div>
 
         <!-- Announcement Button -->
-        <button onclick="openNoticeModal()" class="p-2 rounded-lg border border-custom bg-custom-card-hover text-custom-muted hover:text-white transition" title="Notice Board">
+        <button onclick="openNoticeModal()" class="p-1.5 sm:p-2 rounded-lg border border-custom bg-custom-card-hover text-custom-muted hover:text-white transition" title="Notice Board">
           <i data-lucide="megaphone" class="w-4 h-4"></i>
         </button>
 
         <!-- Letter Generator Button -->
-        <button onclick="openLetterModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-custom bg-custom-card-hover text-xs font-semibold text-white hover:border-emerald-500 transition">
+        <button onclick="openLetterModal()" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-custom bg-custom-card-hover text-xs font-semibold text-white hover:border-emerald-500 transition" title="Petition Letter">
           <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>
           <span class="hidden md:inline">Petition Letter</span>
         </button>
 
         <!-- AI Nutritionist Button -->
-        <button onclick="openAiModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-purple-500/50 bg-purple-500/10 text-xs font-semibold text-purple-300 hover:bg-purple-500/20 transition shadow-sm">
+        <button onclick="openAiModal()" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-purple-500/50 bg-purple-500/10 text-xs font-semibold text-purple-300 hover:bg-purple-500/20 transition shadow-sm" title="AI Nutritionist">
           <i data-lucide="bot" class="w-4 h-4 text-purple-400"></i>
           <span class="hidden md:inline">AI Nutritionist</span>
         </button>
 
         <!-- Theme Selector -->
-        <select id="theme-select" onchange="changeTheme(this.value)" class="bg-black/40 border border-custom text-xs rounded-lg px-2.5 py-1.5 text-white focus:outline-none focus:border-emerald-500">
-          <option value="theme-github-monospace-vandice">🟢 GitHub Dev</option>
+        <select id="theme-select" onchange="changeTheme(this.value)" class="bg-black/40 border border-custom text-[11px] sm:text-xs rounded-lg px-2 sm:px-2.5 py-1.5 text-white focus:outline-none focus:border-emerald-500 max-w-[90px] sm:max-w-none">
+          <option value="theme-github-monospace-vandice">🟢 GitHub</option>
           <option value="theme-kanagawa-dragon">🐲 Kanagawa</option>
-          <option value="theme-tokyo-night">🌃 Tokyo Night</option>
+          <option value="theme-tokyo-night">🌃 Tokyo</option>
           <option value="theme-one-dark">⚛️ One Dark</option>
         </select>
 
         <!-- Admin Toggle -->
-        <button id="admin-btn" onclick="handleAdminToggle()" class="p-2 rounded-lg border border-custom bg-custom-card-hover text-custom-muted hover:text-amber-400 transition" title="Admin Access">
+        <button id="admin-btn" onclick="openAdminModal()" class="p-1.5 sm:p-2 rounded-lg border border-custom bg-custom-card-hover text-custom-muted hover:text-amber-400 transition" title="Admin Access">
           <i data-lucide="shield-alert" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8">
 
     <!-- Hero Announcement Banner -->
-    <div class="relative overflow-hidden rounded-2xl border border-custom bg-custom-card p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
-      <div class="space-y-3 max-w-2xl text-center md:text-left">
+    <div class="relative overflow-hidden rounded-2xl border border-custom bg-custom-card p-4 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6 shadow-xl">
+      <div class="space-y-2 sm:space-y-3 max-w-2xl text-center md:text-left">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border border-custom bg-emerald-500/10 text-emerald-400">
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Shared Student Voice Initiative
         </div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">What should the canteen serve next?</h2>
-        <p class="text-sm text-custom-muted leading-relaxed">
-          Suggest healthy snacks, vote on existing items, and rate recommendations. Suggestions sync in real-time across all devices!
+        <h2 class="text-xl sm:text-3xl font-extrabold text-white leading-tight">What should the canteen serve next?</h2>
+        <p class="text-xs sm:text-sm text-custom-muted leading-relaxed">
+          Suggest healthy snacks, vote on existing items (1 vote per student!), and rate recommendations. Suggestions sync in real-time across all devices!
         </p>
       </div>
-      <div class="flex flex-wrap items-center gap-3">
-        <button onclick="openAddModal()" class="btn-primary px-5 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/10">
-          <i data-lucide="plus-circle" class="w-5 h-5"></i> Suggest Food Item
+      <div class="flex flex-wrap items-center justify-center w-full md:w-auto gap-3">
+        <button onclick="openAddModal()" class="w-full sm:w-auto btn-primary px-5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10">
+          <i data-lucide="plus-circle" class="w-4 h-4 sm:w-5 sm:h-5"></i> Suggest Food Item
         </button>
       </div>
     </div>
 
     <!-- Controls Bar (Tabs, Search, Sort) -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-custom pb-4">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-custom pb-4">
       <!-- Tabs -->
       <div class="flex items-center bg-black/40 p-1 rounded-xl border border-custom w-full sm:w-auto">
-        <button id="tab-leaderboard" onclick="switchTab('leaderboard')" class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition bg-custom-card text-white shadow">
-          <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i> Most Loved Leaderboard
+        <button id="tab-leaderboard" onclick="switchTab('leaderboard')" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition bg-custom-card text-white shadow">
+          <i data-lucide="trophy" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0"></i> <span>Leaderboard</span>
         </button>
-        <button id="tab-discovery" onclick="switchTab('discovery')" class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition text-custom-muted hover:text-white">
-          <i data-lucide="shuffle" class="w-4 h-4 text-purple-400"></i> Discovery Shuffle
+        <button id="tab-discovery" onclick="switchTab('discovery')" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition text-custom-muted hover:text-white">
+          <i data-lucide="shuffle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 shrink-0"></i> <span>Discovery Shuffle</span>
         </button>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+      <div class="flex items-center gap-2 w-full sm:w-auto">
         <!-- Dietary Filter Dropdown -->
-        <select id="diet-filter" onchange="renderFoodGrid()" class="bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+        <select id="diet-filter" onchange="renderFoodGrid()" class="bg-black/40 border border-custom rounded-xl px-2.5 sm:px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 flex-1 sm:flex-none">
           <option value="ALL">🥗 All Types</option>
           <option value="High Protein">💪 High Protein</option>
           <option value="Low Calorie">🌱 Low Calorie</option>
@@ -215,23 +218,23 @@
         <!-- Search Input -->
         <div class="relative flex-1 sm:w-48">
           <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-custom-muted"></i>
-          <input type="text" id="search-input" oninput="renderFoodGrid()" placeholder="Search food items..." class="w-full bg-black/40 border border-custom rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <input type="text" id="search-input" oninput="renderFoodGrid()" placeholder="Search..." class="w-full bg-black/40 border border-custom rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
         </div>
-        <button onclick="shuffleGrid()" class="p-2.5 rounded-xl border border-custom bg-custom-card hover:bg-custom-card-hover text-custom-muted hover:text-white transition" title="Reshuffle display">
+        <button onclick="shuffleGrid()" class="p-2 sm:p-2.5 rounded-xl border border-custom bg-custom-card hover:bg-custom-card-hover text-custom-muted hover:text-white transition shrink-0" title="Reshuffle display">
           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
         </button>
       </div>
     </div>
 
     <!-- Food Cards Grid -->
-    <div id="food-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div id="food-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
       <!-- Dynamically Rendered -->
     </div>
 
     <!-- Empty State -->
-    <div id="empty-state" class="hidden text-center py-16 border border-dashed border-custom rounded-2xl bg-custom-card/50">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-black/40 flex items-center justify-center text-3xl">🍲</div>
-      <h3 class="text-lg font-bold text-white mb-1">No Food Suggestions Found</h3>
+    <div id="empty-state" class="hidden text-center py-12 sm:py-16 border border-dashed border-custom rounded-2xl bg-custom-card/50">
+      <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-black/40 flex items-center justify-center text-2xl sm:text-3xl">🍲</div>
+      <h3 class="text-base sm:text-lg font-bold text-white mb-1">No Food Suggestions Found</h3>
       <p class="text-xs text-custom-muted mb-4">Be the first penguin to suggest something tasty!</p>
       <button onclick="openAddModal()" class="btn-primary px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-2">
         <i data-lucide="plus" class="w-4 h-4"></i> Add Suggestion
@@ -240,64 +243,72 @@
 
   </main>
 
-  
   <!-- Add Item Modal -->
-  <div id="add-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-custom-card border border-custom rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+  <div id="add-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-custom-card border border-custom rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto my-auto">
       <button onclick="closeAddModal()" class="absolute top-4 right-4 text-custom-muted hover:text-white">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
       
-      <div class="flex items-center justify-between border-b border-custom pb-3">
+      <div class="flex items-center justify-between border-b border-custom pb-3 pr-6">
         <div class="flex items-center gap-2">
-          <span class="text-2xl">🍌</span>
-          <h3 class="text-lg font-bold text-white">Suggest New Snack</h3>
+          <span class="text-xl sm:text-2xl">🍌</span>
+          <h3 class="text-base sm:text-lg font-bold text-white">Suggest New Snack</h3>
         </div>
-        <button type="button" onclick="generateAiFoodDetails()" class="px-2.5 py-1 rounded-lg bg-purple-500/20 border border-purple-500/40 text-[11px] font-semibold text-purple-300 hover:bg-purple-500/30 transition flex items-center gap-1">
+        <button type="button" onclick="generateAiFoodDetails()" class="px-2 py-1 rounded-lg bg-purple-500/20 border border-purple-500/40 text-[10px] sm:text-[11px] font-semibold text-purple-300 hover:bg-purple-500/30 transition flex items-center gap-1 shrink-0">
           <i data-lucide="sparkles" class="w-3 h-3 text-purple-400"></i> AI Auto-Fill
         </button>
       </div>
 
-      <form id="add-food-form" onsubmit="handleAddFood(event)" class="space-y-4">
+      <form id="add-food-form" onsubmit="handleAddFood(event)" class="space-y-3.5">
         <div>
           <label class="block text-xs font-medium text-custom-muted mb-1">Food Item Name *</label>
-          <input type="text" id="food-name" required placeholder="e.g. Sprouts Salad, Upma, Greek Yogurt" class="w-full bg-black/40 border border-custom rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+          <input type="text" id="food-name" required placeholder="e.g. Sprouts Salad, Upma, Greek Yogurt" class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500">
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block text-xs font-medium text-custom-muted mb-1">Category</label>
-            <select id="food-category" class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-              <option value="Healthy Snack">🥗 Healthy Snack</option>
-              <option value="Beverage">🥤 Healthy Beverage</option>
-              <option value="Fruit & Salad">🍎 Fruit & Salad</option>
-              <option value="Warm Meal">🍲 Warm Meal</option>
+            <select id="food-category" class="w-full bg-black/40 border border-custom rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="Healthy Snack">🥗 Snack</option>
+              <option value="Beverage">🥤 Beverage</option>
+              <option value="Fruit & Salad">🍎 Salad</option>
+              <option value="Warm Meal">🍲 Meal</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-custom-muted mb-1">Est. Price (₹)</label>
-            <input type="number" id="food-price" placeholder="30" value="30" min="1" max="200" class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <label class="block text-xs font-medium text-custom-muted mb-1">Diet Tag</label>
+            <select id="food-tag" class="w-full bg-black/40 border border-custom rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="High Protein">💪 Protein</option>
+              <option value="Low Calorie">🌱 Low Cal</option>
+              <option value="Vegan">🥦 Vegan</option>
+              <option value="Balanced">⚖️ Balanced</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-custom-muted mb-1">Price (₹)</label>
+            <input type="number" id="food-price" placeholder="30" value="30" min="5" max="200" class="w-full bg-black/40 border border-custom rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-medium text-custom-muted mb-1">Image Keyword / Preset</label>
-          <input type="text" id="food-image" placeholder="e.g. fruit, peanuts, salad, juice" class="w-full bg-black/40 border border-custom rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+          <input type="text" id="food-image" placeholder="e.g. fruit, peanuts, salad, juice" class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500">
         </div>
 
         <div>
           <label class="block text-xs font-medium text-custom-muted mb-1">Why should the canteen serve this?</label>
-          <textarea id="food-desc" rows="3" placeholder="Explain health benefits or popularity..." class="w-full bg-black/40 border border-custom rounded-xl px-3.5 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"></textarea>
+          <textarea id="food-desc" rows="3" placeholder="Explain health benefits or popularity..." class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500"></textarea>
         </div>
 
         <div id="add-error" class="text-xs text-rose-400 hidden flex items-center gap-1.5">
-          <i data-lucide="alert-circle" class="w-4 h-4"></i> <span id="add-error-msg"></span>
+          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i> <span id="add-error-msg"></span>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-2">
-          <button type="button" onclick="closeAddModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-custom-muted hover:text-white">Cancel</button>
-          <button type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
-            <i data-lucide="send" class="w-4 h-4"></i> Submit Suggestion
+          <button type="button" onclick="closeAddModal()" class="px-3.5 py-2 rounded-xl text-xs font-medium text-custom-muted hover:text-white">Cancel</button>
+          <button type="submit" class="btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i> Submit
           </button>
         </div>
       </form>
@@ -305,41 +316,41 @@
   </div>
 
   <!-- Welcome Notice Announcement Modal -->
-  <div id="notice-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-custom-card border border-custom rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-5">
+  <div id="notice-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-custom-card border border-custom rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto my-auto">
       <button onclick="closeNoticeModal()" class="absolute top-4 right-4 text-custom-muted hover:text-white">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="flex items-center gap-3 border-b border-custom pb-4">
-        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+      <div class="flex items-center gap-3 border-b border-custom pb-3.5 pr-6">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg sm:text-xl shrink-0">
           📢
         </div>
         <div>
-          <h3 class="text-lg font-bold text-white">Penguin_Club Guidelines</h3>
-          <p class="text-xs text-custom-muted">Important Notice for Canteen Food Suggestions</p>
+          <h3 class="text-base sm:text-lg font-bold text-white">Penguin_Club Guidelines</h3>
+          <p class="text-[11px] sm:text-xs text-custom-muted">Important Notice for Canteen Food Suggestions</p>
         </div>
       </div>
 
-      <div class="space-y-4 text-sm text-custom-muted">
-        <div class="flex gap-3 p-3 rounded-xl bg-black/30 border border-custom">
-          <span class="text-emerald-400 text-lg font-bold">1.</span>
+      <div class="space-y-3 text-xs sm:text-sm text-custom-muted">
+        <div class="flex gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl bg-black/30 border border-custom">
+          <span class="text-emerald-400 text-base sm:text-lg font-bold shrink-0">1.</span>
           <p class="text-xs leading-relaxed text-slate-200">
             <strong class="text-emerald-400 block mb-0.5">Healthy & Canteen Friendly:</strong>
             Add food items that are healthy, reasonable to prepare, and won't get banned or restricted by school/college health guidelines!
           </p>
         </div>
 
-        <div class="flex gap-3 p-3 rounded-xl bg-black/30 border border-custom">
-          <span class="text-blue-400 text-lg font-bold">2.</span>
+        <div class="flex gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl bg-black/30 border border-custom">
+          <span class="text-blue-400 text-base sm:text-lg font-bold shrink-0">2.</span>
           <p class="text-xs leading-relaxed text-slate-200">
-            <strong class="text-blue-400 block mb-0.5">Constructive Comments:</strong>
-            Leave good comments, feedback, and star ratings. This webpage will be updated regularly with your feedback!
+            <strong class="text-blue-400 block mb-0.5">Shared Real-Time Voting:</strong>
+            Every suggestion, vote, and comment syncs live across all student devices!
           </p>
         </div>
 
-        <div class="flex gap-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
-          <span class="text-amber-400 text-lg font-bold">3.</span>
+        <div class="flex gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <span class="text-amber-400 text-base sm:text-lg font-bold shrink-0">3.</span>
           <p class="text-xs leading-relaxed text-slate-200">
             <strong class="text-amber-400 block mb-0.5">Action Request:</strong>
             "Me alone can't do the change SO I WANT YOU PEOPLE TO MAKE A LETTER AND GIVE SUGGESTION OR REQUEST TO THE CANTEEN PERSON." Use our built-in Letter Generator tool!
@@ -347,11 +358,11 @@
         </div>
       </div>
 
-      <div class="pt-2 flex items-center justify-between">
-        <button onclick="openLetterModal(); closeNoticeModal();" class="text-xs text-emerald-400 hover:underline flex items-center gap-1 font-semibold">
+      <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <button onclick="openLetterModal(); closeNoticeModal();" class="text-xs text-emerald-400 hover:underline flex items-center justify-center sm:justify-start gap-1 font-semibold py-1">
           <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Open Petition Generator
         </button>
-        <button onclick="closeNoticeModal()" class="btn-primary px-5 py-2.5 rounded-xl text-xs font-bold">
+        <button onclick="closeNoticeModal()" class="btn-primary px-5 py-2 sm:py-2.5 rounded-xl text-xs font-bold text-center">
           Understood & Agree
         </button>
       </div>
@@ -359,17 +370,17 @@
   </div>
 
   <!-- Petition Letter Modal -->
-  <div id="letter-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-custom-card border border-custom rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative space-y-4">
+  <div id="letter-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-custom-card border border-custom rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto my-auto">
       <button onclick="closeLetterModal()" class="absolute top-4 right-4 text-custom-muted hover:text-white">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="flex items-center gap-2 border-b border-custom pb-3">
-        <i data-lucide="file-check" class="w-6 h-6 text-emerald-400"></i>
+      <div class="flex items-center gap-2 border-b border-custom pb-3 pr-6">
+        <i data-lucide="file-check" class="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 shrink-0"></i>
         <div>
-          <h3 class="text-lg font-bold text-white">Canteen Request Letter Generator</h3>
-          <p class="text-xs text-custom-muted">Generate a formal letter to present to the canteen manager</p>
+          <h3 class="text-base sm:text-lg font-bold text-white">Canteen Request Letter Generator</h3>
+          <p class="text-[11px] sm:text-xs text-custom-muted">Generate a formal letter to present to the canteen manager</p>
         </div>
       </div>
 
@@ -386,20 +397,20 @@
 
       <div>
         <label class="block text-xs text-custom-muted mb-1">Generated Petition Text</label>
-        <textarea id="letter-output" rows="10" readonly class="w-full font-mono text-xs bg-black/60 border border-custom rounded-xl p-3 text-slate-300 focus:outline-none leading-relaxed"></textarea>
+        <textarea id="letter-output" rows="8" readonly class="w-full font-mono text-[11px] sm:text-xs bg-black/60 border border-custom rounded-xl p-3 text-slate-300 focus:outline-none leading-relaxed"></textarea>
       </div>
 
-      <div class="flex items-center justify-between pt-2">
-        <span id="letter-status" class="text-xs text-emerald-400 font-medium opacity-0 transition">Copied to clipboard!</span>
-        <div class="flex items-center gap-2">
-          <button onclick="readLetterAudio()" id="btn-audio-read" class="px-3 py-2 rounded-xl border border-purple-500/40 bg-purple-500/10 text-xs font-semibold text-purple-300 hover:bg-purple-500/20 transition flex items-center gap-1.5">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+        <span id="letter-status" class="text-xs text-emerald-400 font-medium opacity-0 transition text-center sm:text-left">Copied to clipboard!</span>
+        <div class="flex flex-wrap items-center justify-end gap-2">
+          <button onclick="readLetterAudio()" id="btn-audio-read" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl border border-purple-500/40 bg-purple-500/10 text-xs font-semibold text-purple-300 hover:bg-purple-500/20 transition flex items-center justify-center gap-1.5">
             <i data-lucide="volume-2" class="w-4 h-4 text-purple-400"></i> Listen (TTS)
           </button>
-          <button onclick="copyLetterText()" class="px-4 py-2 rounded-xl border border-custom bg-custom-card-hover text-xs font-semibold text-white hover:border-emerald-500 transition flex items-center gap-1.5">
-            <i data-lucide="copy" class="w-4 h-4"></i> Copy Text
+          <button onclick="copyLetterText()" class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl border border-custom bg-custom-card-hover text-xs font-semibold text-white hover:border-emerald-500 transition flex items-center justify-center gap-1.5">
+            <i data-lucide="copy" class="w-4 h-4"></i> Copy
           </button>
-          <button onclick="downloadLetterText()" class="btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5">
-            <i data-lucide="download" class="w-4 h-4"></i> Download .txt
+          <button onclick="downloadLetterText()" class="w-full sm:w-auto btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i> Download
           </button>
         </div>
       </div>
@@ -407,19 +418,19 @@
   </div>
 
   <!-- AI Nutritionist Modal -->
-  <div id="ai-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-custom-card border border-custom rounded-2xl max-w-lg w-full p-6 shadow-2xl relative space-y-4">
+  <div id="ai-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-custom-card border border-custom rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto my-auto">
       <button onclick="closeAiModal()" class="absolute top-4 right-4 text-custom-muted hover:text-white">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="flex items-center gap-3 border-b border-custom pb-3">
-        <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300 flex items-center justify-center text-xl">
+      <div class="flex items-center gap-3 border-b border-custom pb-3 pr-6">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300 flex items-center justify-center text-lg sm:text-xl shrink-0">
           🤖
         </div>
         <div>
-          <h3 class="text-lg font-bold text-white">Gemini Campus Nutritionist</h3>
-          <p class="text-xs text-custom-muted">Get instant health ratings and smart menu advice</p>
+          <h3 class="text-base sm:text-lg font-bold text-white">Gemini Campus Nutritionist</h3>
+          <p class="text-[11px] sm:text-xs text-custom-muted">Get instant health ratings and smart menu advice</p>
         </div>
       </div>
 
@@ -434,7 +445,7 @@
       </div>
 
       <!-- Chat Output Container -->
-      <div id="ai-chat-box" class="h-56 overflow-y-auto bg-black/50 border border-custom rounded-xl p-3 space-y-3 text-xs leading-relaxed">
+      <div id="ai-chat-box" class="h-48 sm:h-56 overflow-y-auto bg-black/50 border border-custom rounded-xl p-3 space-y-3 text-xs leading-relaxed">
         <div class="bg-purple-950/30 border border-purple-800/40 p-3 rounded-xl text-purple-200">
           👋 Hi! I'm your Penguin_Club AI Nutritionist. Ask me anything about healthy canteen items, nutrition tips, or menu balance!
         </div>
@@ -443,7 +454,7 @@
       <!-- Chat Input Form -->
       <form onsubmit="handleAiChatSubmit(event)" class="flex gap-2">
         <input type="text" id="ai-chat-input" placeholder="Ask Gemini AI for canteen health tips..." class="flex-1 bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
-        <button type="submit" id="ai-send-btn" class="btn-accent px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1">
+        <button type="submit" id="ai-send-btn" class="btn-accent px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 shrink-0">
           <i data-lucide="send" class="w-3.5 h-3.5"></i>
         </button>
       </form>
@@ -451,44 +462,95 @@
   </div>
 
   <!-- Comments Modal -->
-  <div id="comments-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-custom-card border border-custom rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4">
+  <div id="comments-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-custom-card border border-custom rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto my-auto">
       <button onclick="closeCommentsModal()" class="absolute top-4 right-4 text-custom-muted hover:text-white">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <div class="border-b border-custom pb-3">
-        <h3 id="comment-food-title" class="text-lg font-bold text-white">Food Comments</h3>
+      <div class="border-b border-custom pb-3 pr-6">
+        <h3 id="comment-food-title" class="text-base sm:text-lg font-bold text-white">Food Comments</h3>
         <p class="text-xs text-custom-muted">Student reviews and feedback</p>
       </div>
 
-      <div id="comments-list" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+      <div id="comments-list" class="space-y-3 max-h-52 sm:max-h-60 overflow-y-auto pr-1">
         <!-- Rendered Comments -->
       </div>
 
       <form onsubmit="handleAddComment(event)" class="flex gap-2 pt-2 border-t border-custom">
         <input type="text" id="comment-input" required placeholder="Add a constructive comment..." class="flex-1 bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-        <button type="submit" class="btn-primary px-4 py-2 rounded-xl text-xs font-bold">Post</button>
+        <button type="submit" class="btn-primary px-3.5 py-2 rounded-xl text-xs font-bold shrink-0">Post</button>
       </form>
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <!-- Custom Admin Unlock Modal -->
+  <div id="admin-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-custom-card border border-custom rounded-2xl max-w-xs w-full p-5 shadow-2xl relative space-y-4 my-auto text-center">
+      <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 mx-auto flex items-center justify-center text-xl">
+        🔑
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-white">Admin Access</h3>
+        <p class="text-xs text-custom-muted">Enter administrative passcode</p>
+      </div>
+      <input type="password" id="admin-pin-input" placeholder="Passcode..." class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs text-white text-center focus:outline-none focus:border-amber-500">
+      <div class="flex items-center gap-2">
+        <button onclick="closeAdminModal()" class="flex-1 py-2 rounded-xl border border-custom text-xs font-medium text-custom-muted hover:text-white">Cancel</button>
+        <button onclick="submitAdminUnlock()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-black py-2 rounded-xl text-xs font-bold">Unlock</button>
+      </div>
+    </div>
+  </div>
 
-    // Application state
-    let app, db, auth;
-    let currentUser = null;
+  <!-- Custom Delete Confirmation Modal -->
+  <div id="delete-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-custom-card border border-custom rounded-2xl max-w-xs w-full p-5 shadow-2xl relative space-y-4 my-auto text-center">
+      <div class="w-10 h-10 rounded-full bg-rose-500/20 text-rose-400 mx-auto flex items-center justify-center text-xl">
+        🗑️
+      </div>
+      <div>
+        <h3 class="text-base font-bold text-white">Delete Suggestion?</h3>
+        <p class="text-xs text-custom-muted" id="delete-modal-msg">Are you sure you want to remove this item?</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="closeDeleteModal()" class="flex-1 py-2 rounded-xl border border-custom text-xs font-medium text-custom-muted hover:text-white">Cancel</button>
+        <button onclick="confirmDeleteFood()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2 rounded-xl text-xs font-bold">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    // =========================================================================
+    // 🔑 FIREBASE CONFIGURATION
+    // Replace the object below with your actual Firebase Realtime Database config
+    // =========================================================================
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // State Variables
+    let db = null;
+    let foodRef = null;
+    let isCloudConnected = false;
     let foods = [];
     let currentTab = 'leaderboard';
     let isAdmin = false;
     let currentCommentFoodId = null;
-    let isCloudConnected = false;
+    let pendingDeleteFoodId = null;
+
+    // Track user votes locally (device-level toggle prevention)
+    let userVotes = [];
 
     const ADMIN_PIN = "Penguin_from_antartica";
-    const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'penguin-club-food-store';
 
     // Initial Seed Items
     const SEED_ITEMS = [
@@ -503,8 +565,7 @@
         image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=600&q=80",
         upvotes: 14,
         ratings: [5, 4, 5, 5, 4],
-        comments: ["Super crunchy!", "Can we get choco chip version too?"],
-        isPinned: true
+        comments: ["Super crunchy!", "Can we get choco chip version too?"]
       },
       {
         id: "seed-peanuts",
@@ -517,8 +578,7 @@
         image: "https://images.unsplash.com/photo-1567892320421-1c657571ea48?auto=format&fit=crop&w=600&q=80",
         upvotes: 18,
         ratings: [5, 5, 4, 4, 5],
-        comments: ["Best study break snack!", "Very affordable."],
-        isPinned: true
+        comments: ["Best study break snack!", "Very affordable."]
       },
       {
         id: "seed-fruit-salad",
@@ -531,8 +591,7 @@
         image: "https://images.unsplash.com/photo-1568721776563-f375c78f02f9?auto=format&fit=crop&w=600&q=80",
         upvotes: 25,
         ratings: [5, 5, 5, 5, 4],
-        comments: ["Super refreshing during summer", "Clean and hygienic"],
-        isPinned: true
+        comments: ["Super refreshing during summer", "Clean and hygienic"]
       },
       {
         id: "seed-custard",
@@ -545,8 +604,7 @@
         image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80",
         upvotes: 21,
         ratings: [4, 5, 5, 4],
-        comments: ["Delicious dessert option."],
-        isPinned: true
+        comments: ["Delicious dessert option."]
       },
       {
         id: "seed-corn-chat",
@@ -559,17 +617,29 @@
         image: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=600&q=80",
         upvotes: 30,
         ratings: [5, 5, 5, 5, 5],
-        comments: ["Everyone loves sweet corn!", "A must-have for the canteen."],
-        isPinned: true
+        comments: ["Everyone loves sweet corn!", "A must-have for the canteen."]
       }
     ];
 
-    // Initialize Application
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
+      loadUserVotes();
       checkFirstVisit();
-      await initFirebase();
+      initFirebaseCloud();
     });
+
+    function loadUserVotes() {
+      try {
+        const saved = localStorage.getItem('penguin_user_votes');
+        userVotes = saved ? JSON.parse(saved) : [];
+      } catch(e) {
+        userVotes = [];
+      }
+    }
+
+    function saveUserVotes() {
+      localStorage.setItem('penguin_user_votes', JSON.stringify(userVotes));
+    }
 
     function checkFirstVisit() {
       if (!localStorage.getItem('penguin_visited')) {
@@ -578,116 +648,112 @@
       }
     }
 
-    async function initFirebase() {
-      const syncBadge = document.getElementById('sync-badge');
+    // =========================================================================
+    // 🌐 CLOUD DATABASE CONNECTIVITY (Firebase Realtime Database)
+    // =========================================================================
+    function initFirebaseCloud() {
       const syncDot = document.getElementById('sync-dot');
       const syncText = document.getElementById('sync-text');
+
+      // Check if user has entered valid Firebase credentials
+      if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
+        console.warn("Firebase not configured yet. Defaulting to local storage fallback.");
+        setOfflineState("Offline (Local)");
+        loadLocalDataFallback();
+        return;
+      }
 
       try {
-        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-          const config = JSON.parse(__firebase_config);
-          app = initializeApp(config);
-          auth = getAuth(app);
-          db = getFirestore(app);
-
-          // Authenticate
-          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } else {
-            await signInAnonymously(auth);
-          }
-
-          onAuthStateChanged(auth, (user) => {
-            if (user) {
-              currentUser = user;
-              setupRealtimeSync();
-            }
-          });
-        } else {
-          throw new Error("No firebase config");
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
         }
+        db = firebase.database();
+        foodRef = db.ref('food_items');
+
+        // Real-time listener for database updates
+        foodRef.on('value', (snapshot) => {
+          const data = snapshot.val();
+          isCloudConnected = true;
+          setOnlineState("Online (Cloud)");
+
+          if (!data) {
+            // Seed database if empty
+            SEED_ITEMS.forEach(item => {
+              foodRef.child(item.id).set(item);
+            });
+          } else {
+            // Convert object map to array
+            foods = Object.keys(data).map(key => ({
+              id: key,
+              ...data[key]
+            }));
+            renderFoodGrid();
+          }
+        }, (error) => {
+          console.error("Firebase connection error:", error);
+          setOfflineState("Offline (Local)");
+          loadLocalDataFallback();
+        });
+
       } catch (err) {
-        console.warn("Using Local Storage Sync Fallback:", err);
-        isCloudConnected = false;
-        syncDot.className = "w-2 h-2 rounded-full bg-blue-400";
-        syncText.innerText = "Offline (Local)";
-        loadLocalData();
+        console.error("Firebase Initialization Error:", err);
+        setOfflineState("Offline (Local)");
+        loadLocalDataFallback();
       }
     }
 
-    function setupRealtimeSync() {
+    function setOnlineState(msg) {
       const syncDot = document.getElementById('sync-dot');
       const syncText = document.getElementById('sync-text');
-
-      const colRef = collection(db, 'artifacts', APP_ID, 'public', 'data', 'food_items');
-
-      onSnapshot(colRef, (snapshot) => {
-        isCloudConnected = true;
-        syncDot.className = "w-2 h-2 rounded-full bg-emerald-400";
-        syncText.innerText = "Live Cloud Sync";
-
-        if (snapshot.empty) {
-          seedDatabase();
-        } else {
-          foods = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          renderFoodGrid();
-        }
-      }, (err) => {
-        console.error("Firestore sync error:", err);
-        isCloudConnected = false;
-        syncDot.className = "w-2 h-2 rounded-full bg-amber-400";
-        syncText.innerText = "Local Fallback";
-        loadLocalData();
-      });
+      syncDot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+      syncText.innerText = msg;
+      syncText.className = "text-emerald-400 font-semibold hidden xs:inline text-xs";
     }
 
-    async function seedDatabase() {
-      if (!db || !currentUser) return;
-      for (const item of SEED_ITEMS) {
-        const itemRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', item.id);
-        await setDoc(itemRef, item);
-      }
+    function setOfflineState(msg) {
+      const syncDot = document.getElementById('sync-dot');
+      const syncText = document.getElementById('sync-text');
+      syncDot.className = "w-2 h-2 rounded-full bg-amber-400";
+      syncText.innerText = msg;
+      syncText.className = "text-amber-400 hidden xs:inline text-xs";
     }
 
-    function loadLocalData() {
+    function loadLocalDataFallback() {
       const saved = localStorage.getItem('penguin_food_store_items');
       if (saved) {
         foods = JSON.parse(saved);
       } else {
         foods = [...SEED_ITEMS];
-        saveLocalData();
+        saveLocalDataFallback();
       }
       renderFoodGrid();
     }
 
-    function saveLocalData() {
+    function saveLocalDataFallback() {
       localStorage.setItem('penguin_food_store_items', JSON.stringify(foods));
-      notifyOtherTabs();
     }
 
-    const syncChannel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('penguin_club_food_sync') : null;
-    if (syncChannel) {
-      syncChannel.onmessage = (event) => {
-        if (event.data && event.data.type === 'SYNC_FOODS' && !isCloudConnected) {
-          const saved = localStorage.getItem('penguin_food_store_items');
-          if (saved) {
-            foods = JSON.parse(saved);
-            renderFoodGrid();
-          }
-        }
-      };
-    }
+    // Helper: Toast Notifications
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const bgClass = type === "success" ? "bg-emerald-600 text-white border-emerald-400" :
+                      type === "warn" ? "bg-amber-600 text-white border-amber-400" : "bg-custom-card text-white border-custom";
 
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'penguin_food_store_items' && !isCloudConnected) {
-        loadLocalData();
-      }
-    });
+      toast.className = `px-4 py-2.5 rounded-xl border ${bgClass} text-xs font-semibold shadow-2xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto`;
+      toast.innerHTML = `<span>${message}</span>`;
 
-    function notifyOtherTabs() {
-      if (syncChannel) {
-        syncChannel.postMessage({ type: 'SYNC_FOODS', timestamp: Date.now() });
-      }
+      container.appendChild(toast);
+      
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
     }
 
     // Helper: Compute Average Rating
@@ -717,14 +783,14 @@
       const dietFilter = document.getElementById('diet-filter').value;
 
       let itemsToDisplay = foods.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.category.toLowerCase().includes(searchTerm);
-        const matchesDiet = dietFilter === 'ALL' || item.tag === dietFilter || (dietFilter === 'Vegan' && item.category.includes('Salad'));
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm) || (item.category && item.category.toLowerCase().includes(searchTerm));
+        const matchesDiet = dietFilter === 'ALL' || item.tag === dietFilter || (dietFilter === 'Vegan' && item.category && item.category.includes('Salad'));
         return matchesSearch && matchesDiet;
       });
 
       if (currentTab === 'leaderboard') {
         itemsToDisplay.sort((a, b) => {
-          if (b.upvotes !== a.upvotes) return b.upvotes - a.upvotes;
+          if (b.upvotes !== a.upvotes) return (b.upvotes || 0) - (a.upvotes || 0);
           return getAvgRating(b.ratings) - getAvgRating(a.ratings);
         });
       }
@@ -739,33 +805,42 @@
 
       grid.innerHTML = itemsToDisplay.map((food, idx) => {
         const avgRating = getAvgRating(food.ratings);
+        const hasVoted = userVotes.includes(food.id);
+
         const rankBadge = (currentTab === 'leaderboard' && idx < 3) ? 
-          `<span class="absolute top-3 left-3 bg-amber-500 text-black text-xs font-black px-2.5 py-1 rounded-full shadow-lg">#${idx + 1} TOP</span>` : '';
+          `<span class="absolute top-3 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-lg z-10">#${idx + 1} TOP</span>` : '';
+
+        const voteBtnClass = hasVoted 
+          ? "flex-1 bg-emerald-600/90 hover:bg-emerald-600 text-white border border-emerald-400/50 py-1.5 sm:py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow transition"
+          : "flex-1 btn-primary py-1.5 sm:py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow transition";
+
+        const voteBtnIcon = hasVoted ? "check-circle-2" : "thumbs-up";
+        const voteBtnText = hasVoted ? "Voted" : "Upvote";
 
         return `
           <div class="bg-custom-card border border-custom rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between group relative shadow-lg">
             ${rankBadge}
             
             ${isAdmin ? `
-              <button onclick="deleteFood('${food.id}')" class="absolute top-3 right-3 bg-rose-600/90 hover:bg-rose-600 text-white p-1.5 rounded-lg text-xs z-10 transition">
+              <button onclick="promptDeleteFood('${food.id}', '${food.name}')" class="absolute top-3 right-3 bg-rose-600/90 hover:bg-rose-600 text-white p-1.5 rounded-lg text-xs z-20 transition" title="Delete suggestion">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
             ` : ''}
 
             <div>
-              <div class="h-44 overflow-hidden relative bg-black/40">
+              <div class="h-36 sm:h-44 overflow-hidden relative bg-black/40">
                 <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80'">
-                <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg text-[11px] font-medium text-emerald-400 border border-custom flex items-center gap-1.5">
+                <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg text-[10px] sm:text-[11px] font-medium text-emerald-400 border border-custom flex items-center gap-1">
                   <span>${food.category || 'Healthy Snack'}</span>
-                  ${food.price ? `<span class="text-white bg-emerald-500/20 px-1.5 py-0.2 rounded font-bold">₹${food.price}</span>` : ''}
+                  ${food.price ? `<span class="text-white bg-emerald-500/20 px-1 py-0.2 rounded font-bold">₹${food.price}</span>` : ''}
                 </div>
-                ${food.tag ? `<div class="absolute top-3 right-3 bg-purple-500/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-full">${food.tag}</div>` : ''}
+                ${food.tag ? `<div class="absolute top-3 right-3 bg-purple-500/80 backdrop-blur-md text-white text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full">${food.tag}</div>` : ''}
               </div>
 
-              <div class="p-4 space-y-3">
+              <div class="p-3.5 sm:p-4 space-y-2.5 sm:space-y-3">
                 <div class="flex items-start justify-between gap-2">
-                  <h3 class="font-bold text-white text-base leading-snug">${food.name}</h3>
-                  <div class="flex items-center gap-1 text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                  <h3 class="font-bold text-white text-sm sm:text-base leading-snug">${food.name}</h3>
+                  <div class="flex items-center gap-1 text-[11px] sm:text-xs text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-md border border-amber-400/20 shrink-0">
                     ★ <span>${avgRating}</span>
                   </div>
                 </div>
@@ -777,9 +852,9 @@
                 <!-- Interactive Star Rating -->
                 <div class="flex items-center justify-between pt-1">
                   <div class="flex items-center gap-1">
-                    <span class="text-[10px] text-custom-muted mr-1">Rate:</span>
+                    <span class="text-[10px] text-custom-muted mr-0.5">Rate:</span>
                     ${[1, 2, 3, 4, 5].map(star => `
-                      <button onclick="rateFood('${food.id}', ${star})" class="text-xs text-slate-600 hover:text-amber-400 transition transform hover:scale-125">
+                      <button onclick="rateFood('${food.id}',${star})" class="text-xs text-slate-600 hover:text-amber-400 transition transform hover:scale-125">
                         ★
                       </button>
                     `).join('')}
@@ -790,11 +865,11 @@
             </div>
 
             <!-- Card Bottom Actions -->
-            <div class="p-4 pt-0 space-y-2 border-t border-custom/50 mt-2">
-              <div class="flex items-center justify-between gap-2 pt-3">
-                <button onclick="voteFood('${food.id}')" class="flex-1 btn-primary py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow">
-                  <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i> Upvote
-                  <span class="bg-black/20 px-1.5 py-0.5 rounded-full text-[10px] ml-1">${food.upvotes || 0}</span>
+            <div class="p-3.5 sm:p-4 pt-0 space-y-2 border-t border-custom/50 mt-2">
+              <div class="flex items-center justify-between gap-2 pt-2.5 sm:pt-3">
+                <button onclick="voteFood('${food.id}')" class="${voteBtnClass}" title="${hasVoted ? 'Click to remove your vote' : 'Cast 1 vote for this item'}">
+                  <i data-lucide="${voteBtnIcon}" class="w-3.5 h-3.5"></i> ${voteBtnText}
+                  <span class="bg-black/30 px-1.5 py-0.5 rounded-full text-[10px] ml-1">${food.upvotes || 0}</span>
                 </button>
 
                 <button onclick="openCommentsModal('${food.id}')" class="p-2 rounded-xl border border-custom bg-black/30 hover:bg-custom-card-hover text-custom-muted hover:text-white text-xs flex items-center gap-1 transition">
@@ -810,11 +885,41 @@
       lucide.createIcons();
     };
 
-    window.handleAddFood = async function(e) {
+    window.voteFood = function(id) {
+      const item = foods.find(f => f.id === id);
+      if (!item) return;
+
+      const hasVoted = userVotes.includes(id);
+      let newUpvotes = item.upvotes || 0;
+
+      if (hasVoted) {
+        userVotes = userVotes.filter(vId => vId !== id);
+        newUpvotes = Math.max(0, newUpvotes - 1);
+        showToast(`Vote removed for ${item.name}`, "info");
+      } else {
+        userVotes.push(id);
+        newUpvotes += 1;
+        showToast(`Voted for ${item.name}!`, "success");
+        confetti({ particleCount: 30, spread: 50, origin: { y: 0.75 } });
+      }
+
+      saveUserVotes();
+
+      if (isCloudConnected && foodRef) {
+        foodRef.child(id).update({ upvotes: newUpvotes });
+      } else {
+        item.upvotes = newUpvotes;
+        saveLocalDataFallback();
+        renderFoodGrid();
+      }
+    };
+
+    window.handleAddFood = function(e) {
       e.preventDefault();
       const nameInput = document.getElementById('food-name').value.trim();
       const category = document.getElementById('food-category').value;
-      const priceVal = Math.max(1, parseInt(document.getElementById('food-price').value) || 1);
+      const tag = document.getElementById('food-tag').value;
+      const priceVal = parseInt(document.getElementById('food-price').value) || 30;
       const customImg = document.getElementById('food-image').value.trim();
       const desc = document.getElementById('food-desc').value.trim();
       const errBox = document.getElementById('add-error');
@@ -829,10 +934,12 @@
       }
       errBox.classList.add('hidden');
 
+      const newItemId = 'food-' + Date.now();
       const newItem = {
-        id: 'food-' + Date.now(),
+        id: newItemId,
         name: nameInput,
         category: category,
+        tag: tag,
         price: priceVal,
         description: desc || "Healthy item suggested by student community.",
         image: customImg ? (customImg.startsWith('http') ? customImg : getImageForKeyword(nameInput, customImg)) : getImageForKeyword(nameInput),
@@ -842,15 +949,19 @@
         createdAt: new Date().toISOString()
       };
 
-      if (isCloudConnected && db) {
-        await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', newItem.id), newItem);
-      }
-      
-      // Always update local memory & save state for immediate display across tabs
-      foods.unshift(newItem);
-      saveLocalData();
-      renderFoodGrid();
+      // Automatically vote for item created by current user
+      userVotes.push(newItemId);
+      saveUserVotes();
 
+      if (isCloudConnected && foodRef) {
+        foodRef.child(newItemId).set(newItem);
+      } else {
+        foods.unshift(newItem);
+        saveLocalDataFallback();
+        renderFoodGrid();
+      }
+
+      showToast(`Added "${newItem.name}" to cloud suggestions!`, "success");
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
       closeAddModal();
       document.getElementById('add-food-form').reset();
@@ -860,7 +971,7 @@
     window.generateAiFoodDetails = async function() {
       const name = document.getElementById('food-name').value.trim();
       if (!name) {
-        alert("Please enter a food name first!");
+        showToast("Please enter a food name first!", "warn");
         return;
       }
 
@@ -964,13 +1075,12 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     };
 
-    // Gemini Speech Synthesis (TTS)
     window.readLetterAudio = async function() {
       const btn = document.getElementById('btn-audio-read');
       const letterText = document.getElementById('letter-output').value;
       if (!letterText) return;
 
-      btn.innerText = "🔊 Generating Speech...";
+      btn.innerText = "🔊 Generating...";
 
       try {
         const payload = {
@@ -999,7 +1109,6 @@
             pcm16[i] = binaryStr.charCodeAt(i * 2) | (binaryStr.charCodeAt(i * 2 + 1) << 8);
           }
 
-          // Convert PCM to WAV
           const wavBlob = pcmToWav(pcm16, sampleRate);
           const audioUrl = URL.createObjectURL(wavBlob);
           const audio = new Audio(audioUrl);
@@ -1013,7 +1122,7 @@
         console.error("TTS Error:", err);
         btn.innerHTML = `<i data-lucide="volume-2" class="w-4 h-4 text-purple-400"></i> Listen (TTS)`;
         lucide.createIcons();
-        alert("Speech synthesis fallback: Please read the text letter directly.");
+        showToast("Speech synthesis unavailable. Reading plain text.", "warn");
       }
     };
 
@@ -1032,8 +1141,8 @@
       writeString(8, 'WAVE');
       writeString(12, 'fmt ');
       view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true); // PCM format
-      view.setUint16(22, 1, true); // Mono channel
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
       view.setUint32(24, sampleRate, true);
       view.setUint32(28, sampleRate * 2, true);
       view.setUint16(32, 2, true);
@@ -1048,48 +1157,47 @@
       return new Blob([buffer], { type: 'audio/wav' });
     }
 
-    window.voteFood = async function(id) {
-      const item = foods.find(f => f.id === id);
-      if (!item) return;
-
-      const updatedUpvotes = (item.upvotes || 0) + 1;
-
-      if (isCloudConnected && db) {
-        const docRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', id);
-        await updateDoc(docRef, { upvotes: updatedUpvotes });
-      } else {
-        item.upvotes = updatedUpvotes;
-        saveLocalData();
-        renderFoodGrid();
-      }
-    };
-
-    window.rateFood = async function(id, stars) {
+    window.rateFood = function(id, stars) {
       const item = foods.find(f => f.id === id);
       if (!item) return;
 
       const newRatings = [...(item.ratings || []), stars];
 
-      if (isCloudConnected && db) {
-        const docRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', id);
-        await updateDoc(docRef, { ratings: newRatings });
+      if (isCloudConnected && foodRef) {
+        foodRef.child(id).update({ ratings: newRatings });
       } else {
         item.ratings = newRatings;
-        saveLocalData();
+        saveLocalDataFallback();
         renderFoodGrid();
       }
+      showToast(`Rated ${stars} ★ for ${item.name}!`, "success");
     };
 
-    window.deleteFood = async function(id) {
-      if (!confirm("Remove this item from suggestions?")) return;
+    window.promptDeleteFood = function(id, name) {
+      pendingDeleteFoodId = id;
+      document.getElementById('delete-modal-msg').innerText = `Remove "${name}" from suggestions?`;
+      document.getElementById('delete-modal').classList.remove('hidden');
+    };
 
-      if (isCloudConnected && db) {
-        await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', id));
+    window.closeDeleteModal = function() {
+      pendingDeleteFoodId = null;
+      document.getElementById('delete-modal').classList.add('hidden');
+    };
+
+    window.confirmDeleteFood = function() {
+      if (!pendingDeleteFoodId) return;
+      const id = pendingDeleteFoodId;
+
+      if (isCloudConnected && foodRef) {
+        foodRef.child(id).remove();
       } else {
         foods = foods.filter(f => f.id !== id);
-        saveLocalData();
+        saveLocalDataFallback();
         renderFoodGrid();
       }
+
+      showToast("Suggestion deleted.", "warn");
+      closeDeleteModal();
     };
 
     window.openCommentsModal = function(id) {
@@ -1117,7 +1225,7 @@
       `).join('');
     }
 
-    window.handleAddComment = async function(e) {
+    window.handleAddComment = function(e) {
       e.preventDefault();
       const input = document.getElementById('comment-input');
       const val = input.value.trim();
@@ -1128,12 +1236,11 @@
 
       const newComments = [...(item.comments || []), val];
 
-      if (isCloudConnected && db) {
-        const docRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', currentCommentFoodId);
-        await updateDoc(docRef, { comments: newComments });
+      if (isCloudConnected && foodRef) {
+        foodRef.child(currentCommentFoodId).update({ comments: newComments });
       } else {
         item.comments = newComments;
-        saveLocalData();
+        saveLocalDataFallback();
         renderFoodGrid();
       }
 
@@ -1151,11 +1258,11 @@
       const btnDiscovery = document.getElementById('tab-discovery');
 
       if (tab === 'leaderboard') {
-        btnLeaderboard.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition bg-custom-card text-white shadow";
-        btnDiscovery.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition text-custom-muted hover:text-white";
+        btnLeaderboard.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition bg-custom-card text-white shadow";
+        btnDiscovery.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition text-custom-muted hover:text-white";
       } else {
-        btnDiscovery.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition bg-custom-card text-white shadow";
-        btnLeaderboard.className = "flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition text-custom-muted hover:text-white";
+        btnDiscovery.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition bg-custom-card text-white shadow";
+        btnLeaderboard.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition text-custom-muted hover:text-white";
         shuffleGrid();
       }
       renderFoodGrid();
@@ -1170,23 +1277,34 @@
     };
 
     window.changeTheme = function(themeClass) {
-      document.body.className = `${themeClass} min-h-screen flex flex-col antialiased`;
+      document.body.className = `${themeClass} min-h-screen flex flex-col antialiased overflow-x-hidden`;
     };
 
-    window.handleAdminToggle = function() {
+    window.openAdminModal = function() {
       if (isAdmin) {
         isAdmin = false;
-        alert("Admin mode logged out.");
+        showToast("Logged out of Admin mode.", "info");
+        renderFoodGrid();
       } else {
-        const pin = prompt("Enter Admin Passcode:");
-        if (pin === ADMIN_PIN) {
-          isAdmin = true;
-          alert("Admin unlocked! You can now delete suggestions.");
-        } else if (pin !== null) {
-          alert("Incorrect Passcode!");
-        }
+        document.getElementById('admin-pin-input').value = '';
+        document.getElementById('admin-modal').classList.remove('hidden');
       }
-      renderFoodGrid();
+    };
+
+    window.closeAdminModal = function() {
+      document.getElementById('admin-modal').classList.add('hidden');
+    };
+
+    window.submitAdminUnlock = function() {
+      const pin = document.getElementById('admin-pin-input').value;
+      if (pin === ADMIN_PIN) {
+        isAdmin = true;
+        showToast("Admin mode unlocked!", "success");
+        closeAdminModal();
+        renderFoodGrid();
+      } else {
+        showToast("Incorrect Passcode!", "warn");
+      }
     };
 
     // Modal Control Functions
@@ -1207,8 +1325,8 @@
       const group = document.getElementById('letter-group').value || "Students of Penguin_Club";
       const manager = document.getElementById('letter-manager').value || "The Canteen Manager";
       
-      const topItems = [...foods].sort((a,b) => b.upvotes - a.upvotes).slice(0, 5);
-      const itemListStr = topItems.map((item, idx) => `  ${idx + 1}. ${item.name} (${item.upvotes} student votes, ${getAvgRating(item.ratings)}★ rating)`).join('\n');
+      const topItems = [...foods].sort((a,b) => (b.upvotes || 0) - (a.upvotes || 0)).slice(0, 5);
+      const itemListStr = topItems.map((item, idx) => `  ${idx + 1}. ${item.name} (${item.upvotes || 0} student votes, ${getAvgRating(item.ratings)}★ rating)`).join('\n');
 
       const letter = `To: ${manager}
 From: ${group}
