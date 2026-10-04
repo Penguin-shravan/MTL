@@ -511,10 +511,76 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getDatabase, ref, onValue, set, update, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.app.js";
 
-    // Application state
+  // REPLACE THIS WITH YOUR FIREBASE WEB APP CONFIG FROM FIREBASE CONSOLE
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "penguin-food-store.firebaseapp.com",
+    databaseURL: "https://penguin-food-store-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "penguin-food-store",
+    storageBucket: "penguin-food-store.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  let currentUser = null;
+  let foods = [];
+  let userVotes = JSON.parse(localStorage.getItem('penguin_user_votes') || '[]');
+
+  // Anonymous Sign-in
+  signInAnonymously(auth).catch(err => console.error("Auth error:", err));
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+      setupRealtimeSync();
+    }
+  });
+
+  function setupRealtimeSync() {
+    const syncDot = document.getElementById('sync-dot');
+    const syncText = document.getElementById('sync-text');
+    const foodsRef = ref(db, 'food_items');
+
+    onValue(foodsRef, (snapshot) => {
+      const data = snapshot.val();
+      syncDot.className = "w-2 h-2 rounded-full bg-emerald-400";
+      syncText.innerText = "Live";
+
+      if (!data) {
+        // Seed database if empty
+        SEED_ITEMS.forEach(item => {
+          set(ref(db, 'food_items/' + item.id), item);
+        });
+      } else {
+        foods = Object.values(data);
+        renderFoodGrid();
+      }
+    }, (error) => {
+      syncDot.className = "w-2 h-2 rounded-full bg-rose-400";
+      syncText.innerText = "Permission Denied";
+      console.error(error);
+    });
+  }
+
+  // Database helper actions
+  window.saveFoodToDb = function(foodItem) {
+    set(ref(db, 'food_items/' + foodItem.id), foodItem);
+  };
+
+  window.updateUpvotesInDb = function(foodId, upvotesCount) {
+    update(ref(db, 'food_items/' + foodId), { upvotes: upvotesCount });
+  };
+
+  window.deleteFoodFromDb = function(foodId) {
+    remove(ref(db, 'food_items/' + foodId));
+  };    // Application state
     let app, db, auth;
     let currentUser = null;
     let foods = [];
