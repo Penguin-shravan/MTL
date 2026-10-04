@@ -262,19 +262,28 @@
           <input type="text" id="food-name" required placeholder="e.g. Sprouts Salad, Upma, Greek Yogurt" class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-emerald-500">
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block text-xs font-medium text-custom-muted mb-1">Category</label>
-            <select id="food-category" class="w-full bg-black/40 border border-custom rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-              <option value="Healthy Snack">🥗 Healthy Snack</option>
-              <option value="Beverage">🥤 Healthy Beverage</option>
-              <option value="Fruit & Salad">🍎 Fruit & Salad</option>
-              <option value="Warm Meal">🍲 Warm Meal</option>
+            <select id="food-category" class="w-full bg-black/40 border border-custom rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="Healthy Snack">🥗 Snack</option>
+              <option value="Beverage">🥤 Beverage</option>
+              <option value="Fruit & Salad">🍎 Salad</option>
+              <option value="Warm Meal">🍲 Meal</option>
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-custom-muted mb-1">Est. Price (₹)</label>
-            <input type="number" id="food-price" placeholder="30" value="30" min="5" max="200" class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <label class="block text-xs font-medium text-custom-muted mb-1">Diet Tag</label>
+            <select id="food-tag" class="w-full bg-black/40 border border-custom rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+              <option value="High Protein">💪 Protein</option>
+              <option value="Low Calorie">🌱 Low Cal</option>
+              <option value="Vegan">🥦 Vegan</option>
+              <option value="Balanced">⚖️ Balanced</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-custom-muted mb-1">Price (₹)</label>
+            <input type="number" id="food-price" placeholder="30" value="30" min="5" max="200" class="w-full bg-black/40 border border-custom rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
           </div>
         </div>
 
@@ -527,6 +536,24 @@
     // Track user votes: array of food IDs voted by this user device
     let userVotes = [];
 
+    // Broadcast channel for instant cross-tab real-time sync
+    const syncChannel = 'BroadcastChannel' in window ? new BroadcastChannel('penguin_club_food_sync') : null;
+
+    if (syncChannel) {
+      syncChannel.onmessage = (event) => {
+        if (event.data && event.data.type === 'SYNC_FOODS') {
+          foods = event.data.foods;
+          renderFoodGrid();
+        }
+      };
+    }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'penguin_food_store_items') {
+        loadLocalData();
+      }
+    });
+
     const ADMIN_PIN = "Penguin_from_antartica";
     const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'penguin-club-food-store';
 
@@ -683,7 +710,10 @@
         if (snapshot.empty) {
           seedDatabase();
         } else {
-          foods = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          const remoteFoods = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          // Merge remote items with local items preserving votes and additions
+          foods = remoteFoods;
+          saveLocalData(false);
           renderFoodGrid();
         }
       }, (err) => {
@@ -700,6 +730,24 @@
       for (const item of SEED_ITEMS) {
         const itemRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', item.id);
         await setDoc(itemRef, item);
+      }
+    }
+
+    function loadLocalData() {
+      const saved = localStorage.getItem('penguin_food_store_items');
+      if (saved) {
+        foods = JSON.parse(saved);
+      } else {
+        foods = [...SEED_ITEMS];
+        saveLocalData(false);
+      }
+      renderFoodGrid();
+    }
+
+    function saveLocalData(broadcast = true) {
+      localStorage.setItem('penguin_food_store_items', JSON.stringify(foods));
+      if (broadcast && syncChannel) {
+        syncChannel.postMessage({ type: 'SYNC_FOODS', foods: foods });
       }
     }
 
@@ -891,13 +939,12 @@
       }
 
       saveUserVotes();
+      saveLocalData();
+      renderFoodGrid();
 
       if (isCloudConnected && db) {
         const docRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', id);
         await updateDoc(docRef, { upvotes: item.upvotes });
-      } else {
-        saveLocalData();
-        renderFoodGrid();
       }
     };
 
@@ -905,6 +952,7 @@
       e.preventDefault();
       const nameInput = document.getElementById('food-name').value.trim();
       const category = document.getElementById('food-category').value;
+      const tag = document.getElementById('food-tag').value;
       const priceVal = parseInt(document.getElementById('food-price').value) || 30;
       const customImg = document.getElementById('food-image').value.trim();
       const desc = document.getElementById('food-desc').value.trim();
@@ -924,6 +972,7 @@
         id: 'food-' + Date.now(),
         name: nameInput,
         category: category,
+        tag: tag,
         price: priceVal,
         description: desc || "Healthy item suggested by student community.",
         image: customImg ? (customImg.startsWith('http') ? customImg : getImageForKeyword(nameInput, customImg)) : getImageForKeyword(nameInput),
@@ -937,12 +986,13 @@
       userVotes.push(newItem.id);
       saveUserVotes();
 
+      // Immediately append locally and broadcast to other tabs/windows
+      foods.unshift(newItem);
+      saveLocalData();
+      renderFoodGrid();
+
       if (isCloudConnected && db) {
         await setDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'food_items', newItem.id), newItem);
-      } else {
-        foods.unshift(newItem);
-        saveLocalData();
-        renderFoodGrid();
       }
 
       showToast(`Added "${newItem.name}" to menu suggestions!`, "success");
