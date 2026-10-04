@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "food_items": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": ["upvotes"],
+      "$foodId": {
+        ".validate": "newData.hasChildren(['name', 'category'])"
+      }
+    }
+  }
+}
