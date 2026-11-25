@@ -1,1073 +1,496 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Penguin Food Store — Campus Canteen Menu Board</title>
-  <meta name="description" content="Penguin_Club live canteen menu suggestion board. Suggest, vote and rate healthy food items for your campus canteen." />
-
-  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-
-  <style>
-    /* ---- Theme tokens consumed by .bg-custom-card / .border-custom / .text-custom-muted ---- */
-    .theme-emerald {
-      --c-card: rgba(13, 42, 36, 0.72);
-      --c-border: rgba(52, 211, 153, 0.18);
-      --c-muted: #9db3ad;
-      --c-card-hover: rgba(17, 62, 51, 0.88);
-    }
-    .theme-sky {
-      --c-card: rgba(11, 33, 56, 0.72);
-      --c-border: rgba(56, 189, 248, 0.20);
-      --c-muted: #9fb6cc;
-      --c-card-hover: rgba(16, 51, 82, 0.88);
-    }
-    .theme-rose {
-      --c-card: rgba(52, 17, 33, 0.72);
-      --c-border: rgba(251, 113, 133, 0.20);
-      --c-muted: #c3a3ad;
-      --c-card-hover: rgba(78, 26, 48, 0.88);
-    }
-    .theme-amber {
-      --c-card: rgba(51, 37, 12, 0.72);
-      --c-border: rgba(251, 191, 36, 0.20);
-      --c-muted: #c4b48c;
-      --c-card-hover: rgba(76, 56, 18, 0.88);
-    }
-
-    /* These utilities are not Tailwind colors, so define them ourselves */
-    .bg-custom-card { background-color: var(--c-card); }
-    .bg-custom-card-hover { background-color: var(--c-card-hover); }
-    .text-custom-muted { color: var(--c-muted); }
-    .border-custom { border-color: var(--c-border); }
-    .border-custom\/50 { border-color: color-mix(in srgb, var(--c-border) 50%, transparent); }
-    .hover\:bg-custom-card-hover:hover { background-color: var(--c-card-hover); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #fff;
-    }
-    .btn-primary:hover { filter: brightness(1.08); }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(148,163,184,.25); border-radius: 8px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,.45); }
-
-    /* Let modals scroll on short screens */
-    .modal-scroll { max-height: 85vh; overflow-y: auto; }
-  </style>
-</head>
-
-<body class="theme-emerald min-h-screen flex flex-col antialiased overflow-x-hidden bg-[#060b0f] text-white selection:bg-emerald-500/30">
-
-  <!-- ============================ HEADER ============================ -->
-  <header class="sticky top-0 z-40 backdrop-blur-xl bg-black/60 border-b border-custom">
-    <div class="max-w-6xl mx-auto px-3 sm:px-5 py-3 flex items-center gap-3">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-sky-500 grid place-items-center shrink-0 shadow-lg shadow-emerald-500/20">
-          <i data-lucide="egg-fried" class="w-5 h-5 text-black"></i>
-        </div>
-        <div class="min-w-0">
-          <h1 class="text-sm sm:text-base font-black tracking-tight leading-tight truncate">Penguin Food Store</h1>
-          <p class="text-[10px] sm:text-[11px] text-custom-muted leading-tight truncate">Penguin_Club · Canteen Menu Board</p>
-        </div>
-      </div>
-
-      <div class="ml-auto flex items-center gap-2">
-        <!-- theme switcher -->
-        <div class="hidden sm:flex items-center gap-1 p-1 rounded-xl bg-black/40 border border-custom">
-          <button onclick="changeTheme('theme-emerald')" title="Emerald" class="w-5 h-5 rounded-full bg-emerald-400 hover:scale-110 transition"></button>
-          <button onclick="changeTheme('theme-sky')" title="Sky" class="w-5 h-5 rounded-full bg-sky-400 hover:scale-110 transition"></button>
-          <button onclick="changeTheme('theme-rose')" title="Rose" class="w-5 h-5 rounded-full bg-rose-400 hover:scale-110 transition"></button>
-          <button onclick="changeTheme('theme-amber')" title="Amber" class="w-5 h-5 rounded-full bg-amber-400 hover:scale-110 transition"></button>
-        </div>
-
-        <!-- realtime sync indicator -->
-        <div class="flex items-center gap-1.5 px-2 py-1.5 rounded-xl bg-black/40 border border-custom">
-          <span id="sync-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-          <span id="sync-text" class="text-[10px] sm:text-[11px] font-semibold text-custom-muted">Connecting…</span>
-        </div>
-
-        <button onclick="openAdminModal()" title="Admin mode" class="p-2 rounded-xl border border-custom bg-black/40 hover:bg-custom-card-hover text-custom-muted hover:text-white transition">
-          <i data-lucide="shield-half" class="w-4 h-4"></i>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ============================ MAIN ============================ -->
-  <main class="flex-1 w-full max-w-6xl mx-auto px-3 sm:px-5 py-5 sm:py-7 space-y-5">
-
-    <!-- hero -->
-    <section class="text-center space-y-2">
-      <h2 class="text-xl sm:text-3xl font-black tracking-tight">What should the canteen cook next?</h2>
-      <p class="text-xs sm:text-sm text-custom-muted max-w-xl mx-auto">
-        Suggest a dish, rally your friends with upvotes, and rate the healthy hits. The top five get turned into a formal request letter.
-      </p>
-    </section>
-
-    <!-- toolbar -->
-    <section class="space-y-3">
-      <div class="flex flex-col sm:flex-row gap-2.5">
-        <div class="relative flex-1">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-custom-muted pointer-events-none"></i>
-          <input id="search-input" type="search" placeholder="Search dishes or categories…"
-                 oninput="renderFoodGrid()"
-                 class="w-full bg-custom-card border border-custom rounded-xl py-2.5 pl-9 pr-3 text-sm text-white placeholder-custom-muted focus:outline-none focus:border-emerald-500/60 transition" />
-        </div>
-
-        <select id="diet-filter" onchange="renderFoodGrid()"
-                class="bg-custom-card border border-custom rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none focus:border-emerald-500/60 transition">
-          <option value="ALL">All diets</option>
-          <option value="Vegan">Vegan</option>
-          <option value="Low Sugar">Low Sugar</option>
-          <option value="High Protein">High Protein</option>
-          <option value="Low Calorie">Low Calorie</option>
-        </select>
-
-        <button onclick="openAddModal()" class="btn-primary px-4 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition">
-          <i data-lucide="plus" class="w-4 h-4"></i> Suggest a dish
-        </button>
-
-        <button onclick="openLetterModal()" title="Generate request letter" class="px-3.5 py-2.5 rounded-xl border border-custom bg-custom-card text-custom-muted hover:text-white hover:bg-custom-card-hover transition flex items-center gap-2">
-          <i data-lucide="file-text" class="w-4 h-4"></i>
-          <span class="text-xs font-semibold sm:hidden">Letter</span>
-        </button>
-      </div>
-
-      <!-- tabs -->
-      <div class="flex gap-2 p-1 rounded-xl bg-black/40 border border-custom">
-        <button id="tab-leaderboard" onclick="switchTab('leaderboard')"
-                class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition bg-custom-card text-white shadow">
-          <i data-lucide="trophy" class="w-3.5 h-3.5"></i> Leaderboard
-        </button>
-        <button id="tab-discovery" onclick="switchTab('discovery')"
-                class="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition text-custom-muted hover:text-white">
-          <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Discovery
-        </button>
-      </div>
-    </section>
-
-    <!-- food grid -->
-    <section>
-      <div id="food-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4"></div>
-
-      <div id="empty-state" class="hidden text-center py-16 px-4 border border-dashed border-custom rounded-2xl">
-        <i data-lucide="utensils-crossed" class="w-9 h-9 mx-auto text-custom-muted mb-3"></i>
-        <p class="text-sm font-bold mb-1">No dishes match that filter</p>
-        <p class="text-xs text-custom-muted mb-4">Be the first to put it on the canteen board.</p>
-        <button onclick="openAddModal()" class="btn-primary px-4 py-2 rounded-xl text-xs font-bold">Suggest a dish</button>
-      </div>
-    </section>
-  </main>
-
-  <footer class="border-t border-custom py-4 text-center">
-    <p class="text-[10px] sm:text-[11px] text-custom-muted">
-      Penguin_Club Food Store · suggestions stay on your device until Firebase is connected
-    </p>
-  </footer>
-
-  <!-- ============================ TOASTS ============================ -->
-  <div id="toast-container" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[70] flex flex-col items-center gap-2 pointer-events-none"></div>
-
-  <!-- ============================ MODALS ============================ -->
-
-  <!-- first visit notice -->
-  <div id="notice-modal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm p-4 grid place-items-center"
-       onclick="if(event.target === this) closeNoticeModal();">
-    <div class="modal-scroll w-full max-w-sm bg-custom-card border border-custom rounded-2xl p-5 shadow-2xl">
-      <div class="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 grid place-items-center mb-3">
-        <i data-lucide="penguin" class="w-5 h-5 text-emerald-400"></i>
-      </div>
-      <h3 class="text-base font-black mb-1.5">Welcome to the Food Store</h3>
-      <p class="text-xs text-custom-muted leading-relaxed">
-        This is a live canteen menu board for Penguin_Club. Anyone can suggest a dish, upvote the
-        healthy ones, leave comments and rate them. When the club admin enables Firebase, every
-        change syncs to everyone in real time.
-      </p>
-      <button onclick="closeNoticeModal()" class="btn-primary w-full mt-4 py-2.5 rounded-xl text-xs font-bold">Got it</button>
-    </div>
-  </div>
-
-  <!-- add dish -->
-  <div id="add-modal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm p-4 grid place-items-center"
-       onclick="if(event.target === this) closeAddModal();">
-    <div class="modal-scroll w-full max-w-md bg-custom-card border border-custom rounded-2xl p-5 shadow-2xl">
-      <div class="flex items-start justify-between gap-3 mb-4">
-        <div>
-          <h3 class="text-base font-black">Suggest a dish</h3>
-          <p class="text-[11px] text-custom-muted mt-0.5">Healthy, affordable, canteen-friendly.</p>
-        </div>
-        <button onclick="closeAddModal()" class="p-1.5 rounded-lg border border-custom text-custom-muted hover:text-white transition">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <form id="add-food-form" onsubmit="handleAddFood(event)" class="space-y-3">
-        <div>
-          <label for="food-name" class="block text-[11px] font-semibold text-custom-muted mb-1">Dish name *</label>
-          <input id="food-name" required maxlength="60" placeholder="e.g. Masala Chai"
-                 class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500/60 transition" />
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label for="food-category" class="block text-[11px] font-semibold text-custom-muted mb-1">Category</label>
-            <select id="food-category"
-                    class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500/60 transition">
-              <option value="Healthy Snack">Healthy Snack</option>
-              <option value="Fruit &amp; Salad">Fruit &amp; Salad</option>
-              <option value="Beverages">Beverages</option>
-              <option value="Sandwich &amp; Roll">Sandwich &amp; Roll</option>
-            </select>
-          </div>
-          <div>
-            <label for="food-price" class="block text-[11px] font-semibold text-custom-muted mb-1">Price (₹)</label>
-            <input id="food-price" type="number" min="0" max="999" value="30"
-                   class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500/60 transition" />
-          </div>
-        </div>
-
-        <div>
-          <label for="food-image" class="block text-[11px] font-semibold text-custom-muted mb-1">Image URL or keyword (optional)</label>
-          <input id="food-image" maxlength="200" placeholder="https://… or &quot;juice&quot;"
-                 class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm placeholder-custom-muted focus:outline-none focus:border-emerald-500/60 transition" />
-        </div>
-
-        <div>
-          <label for="food-desc" class="block text-[11px] font-semibold text-custom-muted mb-1">Why this dish? (optional)</label>
-          <textarea id="food-desc" rows="2" maxlength="240" placeholder="Short, tasty and cheap…"
-                    class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm placeholder-custom-muted focus:outline-none focus:border-emerald-500/60 transition resize-none"></textarea>
-        </div>
-
-        <div id="add-error" class="hidden text-[11px] font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-xl px-3 py-2">
-          <span id="add-error-msg"></span>
-        </div>
-
-        <div class="flex gap-2 pt-1">
-          <button type="button" onclick="closeAddModal()" class="flex-1 py-2.5 rounded-xl border border-custom text-xs font-bold text-custom-muted hover:text-white transition">Cancel</button>
-          <button type="submit" class="btn-primary flex-1 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-emerald-500/20">Add to board</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- comments -->
-  <div id="comments-modal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm p-4 grid place-items-center"
-       onclick="if(event.target === this) closeCommentsModal();">
-    <div class="modal-scroll w-full max-w-md bg-custom-card border border-custom rounded-2xl p-5 shadow-2xl">
-      <div class="flex items-start justify-between gap-3 mb-3">
-        <h3 id="comment-food-title" class="text-base font-black">Comments</h3>
-        <button onclick="closeCommentsModal()" class="p-1.5 rounded-lg border border-custom text-custom-muted hover:text-white transition">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div id="comments-list" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
-
-      <form onsubmit="handleAddComment(event)" class="flex gap-2 mt-4">
-        <input id="comment-input" maxlength="200" placeholder="Add a friendly note…"
-               class="flex-1 bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm placeholder-custom-muted focus:outline-none focus:border-emerald-500/60 transition" />
-        <button type="submit" class="btn-primary px-4 rounded-xl text-xs font-bold">Post</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- delete confirm -->
-  <div id="delete-modal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm p-4 grid place-items-center">
-    <div class="w-full max-w-xs bg-custom-card border border-custom rounded-2xl p-5 shadow-2xl text-center">
-      <i data-lucide="triangle-alert" class="w-7 h-7 mx-auto text-amber-400 mb-2"></i>
-      <p id="delete-modal-msg" class="text-sm font-bold mb-1">Remove this suggestion?</p>
-      <p class="text-[11px] text-custom-muted mb-4">This deletes it for everyone, on every device.</p>
-      <div class="flex gap-2">
-        <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl border border-custom text-xs font-bold text-custom-muted hover:text-white transition">Keep</button>
-        <button onclick="confirmDeleteFood()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition">Delete</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- admin unlock -->
-  <div id="admin-modal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm p-4 grid place-items-center"
-       onclick="if(event.target === this) closeAdminModal();">
-    <div class="w-full max-w-xs bg-custom-card border border-custom rounded-2xl p-5 shadow-2xl">
-      <div class="flex items-start justify-between gap-3 mb-3">
-        <h3 class="text-sm font-black flex items-center gap-2"><i data-lucide="shield-half" class="w-4 h-4 text-emerald-400"></i> Admin mode</h3>
-        <button onclick="closeAdminModal()" class="p-1.5 rounded-lg border border-custom text-custom-muted hover:text-white transition">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-      <p class="text-[11px] text-custom-muted mb-3">Enter the club passcode to manage suggestions.</p>
-      <input id="admin-pin-input" type="password" placeholder="Passcode"
-             onkeydown="if(event.key === 'Enter') submitAdminUnlock();"
-             class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500/60 transition" />
-      <button onclick="submitAdminUnlock()" class="btn-primary w-full mt-3 py-2.5 rounded-xl text-xs font-bold">Unlock</button>
-    </div>
-  </div>
-
-  <!-- request letter -->
-  <div id="letter-modal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm p-4 grid place-items-center"
-       onclick="if(event.target === this) closeLetterModal();">
-    <div class="modal-scroll w-full max-w-2xl bg-custom-card border border-custom rounded-2xl p-5 shadow-2xl space-y-3">
-      <div class="flex items-start justify-between gap-3">
-        <div>
-          <h3 class="text-base font-black">Request letter to the canteen</h3>
-          <p class="text-[11px] text-custom-muted mt-0.5">Auto-generated from the current top 5 suggestions.</p>
-        </div>
-        <button onclick="closeLetterModal()" class="p-1.5 rounded-lg border border-custom text-custom-muted hover:text-white transition">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label for="letter-group" class="block text-[11px] font-semibold text-custom-muted mb-1">From (group)</label>
-          <input id="letter-group" maxlength="80" placeholder="Students of Penguin_Club"
-                 oninput="updateLetterText()"
-                 class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500/60 transition" />
-        </div>
-        <div>
-          <label for="letter-manager" class="block text-[11px] font-semibold text-custom-muted mb-1">To (manager)</label>
-          <input id="letter-manager" maxlength="80" placeholder="The Canteen Manager"
-                 oninput="updateLetterText()"
-                 class="w-full bg-black/40 border border-custom rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-emerald-500/60 transition" />
-        </div>
-      </div>
-
-      <textarea id="letter-output" readonly rows="12"
-                class="w-full bg-black/50 border border-custom rounded-xl px-3 py-2.5 text-xs font-mono leading-relaxed focus:outline-none"></textarea>
-
-      <div class="flex items-center gap-2">
-        <button onclick="copyLetterText()" class="btn-primary px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
-          <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
-        </button>
-        <button onclick="downloadLetterText()" class="px-4 py-2.5 rounded-xl border border-custom text-xs font-bold text-custom-muted hover:text-white hover:bg-custom-card-hover transition flex items-center gap-2">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i> Download .txt
-        </button>
-        <span id="letter-status" class="text-[11px] font-bold text-emerald-400 opacity-0 transition-opacity">Copied!</span>
-      </div>
-    </div>
-  </div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-  import { getDatabase, ref, onValue, set, update, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-  // FIREBASE CONFIGURATION
-  // REPLACE THESE WITH YOUR EXACT FIREBASE CONSOLE KEYS
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAJHDktMlm-pBCPdrdUw_ElI7C5xER7pOM",
-    authDomain: "penguin-food-store.firebaseapp.com",
-    databaseURL: "https://penguin-food-store-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "penguin-food-store",
-    storageBucket: "penguin-food-store.firebasestorage.app",
-    messagingSenderId: "808246452718",
-    appId: "1:808246452718:web:716756958e181bf7db2eff",
-    measurementId: "G-T1P8X91J4Q"
-  };
-
-  // State Management (Scoped to this module)
-  let firebaseApp = null;
-  let authObj = null;
-  let databaseObj = null;
-  let currentUser = null;
-  let foods = [];
-  let currentTab = 'leaderboard';
-  let isAdmin = false;
-  let currentCommentFoodId = null;
-  let pendingDeleteFoodId = null;
-  let isCloudConnected = false;
-  let userVotes = [];
-
-  const ADMIN_PIN = "Penguin_from_antartica";
-
-  const SEED_ITEMS = [
-    {
-      id: "seed-cookie",
-      name: "Cookie",
-      category: "Healthy Snack",
-      price: 20,
-      tag: "Low Sugar",
-      calories: "140 kcal",
-      description: "Freshly baked whole wheat oat cookies with low sugar.",
-      image: "https://images.unsplash.com/photo-1558961362-fa8fdf82db35?auto=format&fit=crop&w=600&q=80",
-      upvotes: 15,
-      ratings: [5, 4, 5, 5, 4],
-      comments: ["Super crunchy!", "Can we get choco chip version too?"],
-      isPinned: true
-    },
-    {
-      id: "seed-peanuts",
-      name: "Salted peanuts",
-      category: "Healthy Snack",
-      price: 15,
-      tag: "High Protein",
-      calories: "180 kcal",
-      description: "Roasted salted peanuts packed with protein and good fats.",
-      image: "https://images.unsplash.com/photo-1567892320420-1c657571ea48?auto=format&fit=crop&w=600&q=80",
-      upvotes: 19,
-      ratings: [5, 5, 4, 4, 5],
-      comments: ["Best study break snack!", "Very affordable."],
-      isPinned: true
-    },
-    {
-      id: "seed-fruit-salad",
-      name: "Fruit salad",
-      category: "Fruit & Salad",
-      price: 35,
-      tag: "Vegan",
-      calories: "110 kcal",
-      description: "Fresh seasonal sliced fruits mix with a hint of chat masala.",
-      image: "https://images.unsplash.com/photo-1568721776562-f375c78f02f9?auto=format&fit=crop&w=600&q=80",
-      upvotes: 26,
-      ratings: [5, 5, 5, 5, 4],
-      comments: ["Super refreshing during summer", "Clean and hygienic"],
-      isPinned: true
-    },
-    {
-      id: "seed-custard",
-      name: "Custard",
-      category: "Healthy Snack",
-      price: 30,
-      tag: "Low Calorie",
-      calories: "150 kcal",
-      description: "Chilled fruit custard bowl with pomegranate and apples.",
-      image: "https://images.unsplash.com/photo-1551024708-8f23befc6f87?auto=format&fit=crop&w=600&q=80",
-      upvotes: 22,
-      ratings: [5, 5, 5, 4],
-      comments: ["Delicious dessert option."],
-      isPinned: true
-    },
-    {
-      id: "seed-corn-chat",
-      name: "Corn chat",
-      category: "Healthy Snack",
-      price: 25,
-      tag: "Vegan",
-      calories: "130 kcal",
-      description: "Warm steamed sweet corn mixed with lemon juice and mild spices.",
-      image: "https://images.unsplash.com/photo-1551782449-a2132b4ba21d?auto=format&fit=crop&w=600&q=80",
-      upvotes: 31,
-      ratings: [5, 5, 5, 5, 5],
-      comments: ["Everyone loves sweet corn!", "A must-have for the canteen."],
-      isPinned: true
-    }
-  ];
-
-  window.addEventListener('DOMContentLoaded', async () => {
-    if (window.lucide) window.lucide.createIcons();
-    loadUserVotes();
-    checkFirstVisit();
-    await initFirebase();
-  });
-
-  function loadUserVotes() {
-    try {
-      const saved = localStorage.getItem('penguin_user_votes');
-      userVotes = saved ? JSON.parse(saved) : [];
-    } catch(e) {
-      userVotes = [];
-    }
-  }
-
-  function saveUserVotes() {
-    localStorage.setItem('penguin_user_votes', JSON.stringify(userVotes));
-  }
-
-  function checkFirstVisit() {
-    if (!localStorage.getItem('penguin_visited')) {
-      window.openNoticeModal();
-      localStorage.setItem('penguin_visited', 'true');
-    }
-  }
-
-  async function initFirebase() {
-    const syncDot = document.getElementById('sync-dot');
-    const syncText = document.getElementById('sync-text');
-
-    try {
-      firebaseApp = initializeApp(firebaseConfig);
-      authObj = getAuth(firebaseApp);
-      databaseObj = getDatabase(firebaseApp);
-
-      await signInAnonymously(authObj);
-
-      onAuthStateChanged(authObj, (user) => {
-        if (user) {
-          currentUser = user;
-          setupRealtimeSync();
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Important Message</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-up-1': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'fade-up-2': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards',
+                        'fade-up-3': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.95s forwards',
+                        'fade-in-btn': 'fadeIn 0.8s ease-out 1.45s forwards',
+                        'wiggle-slow': 'wiggle 2.5s ease-in-out infinite',
+                        'float-bounce': 'floatBounce 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(24px) scale(0.98)' },
+                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-4deg)' },
+                            '50%': { transform: 'rotate(4deg)' },
+                        },
+                        floatBounce: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-18px) rotate(12deg)' },
+                        }
+                    }
+                }
+            }
         }
-      }, (authError) => {
-        console.warn("Firebase Auth error, using local storage fallback:", authError);
-        useOfflineMode();
-      });
-    } catch (err) {
-      console.warn("Firebase initialization skipped or failed, using local storage fallback:", err);
-      useOfflineMode();
-    }
+    </script>
+</head>
+<body class="bg-zinc-950 text-zinc-50 font-sans min-h-screen flex flex-col items-center justify-between p-4 sm:p-8 selection:bg-rose-500 selection:text-white overflow-hidden relative select-none">
 
-    function useOfflineMode() {
-      isCloudConnected = false;
-      if (syncDot) syncDot.className = "w-2 h-2 rounded-full bg-amber-400";
-      if (syncText) syncText.innerText = "Offline Mode";
-      loadLocalData();
-    }
-  }
+    <!-- Subtle ambient background glow -->
+    <div class="pointer-events-none fixed inset-0 flex items-center justify-center overflow-hidden">
+        <div class="w-[300px] h-[300px] sm:w-[550px] sm:h-[550px] bg-rose-950/20 rounded-full blur-3xl"></div>
+    </div>
 
-  function setupRealtimeSync() {
-    const syncDot = document.getElementById('sync-dot');
-    const syncText = document.getElementById('sync-text');
-    const foodsRef = ref(databaseObj, 'food_items');
+    <!-- Floating/Bouncing Goofy Emojis Layer -->
+    <div id="emoji-playground" class="pointer-events-none fixed inset-0 overflow-hidden z-0" aria-hidden="true">
+        <span class="floating-emoji absolute top-[12%] left-[8%] text-3xl sm:text-5xl opacity-35 animate-float-bounce" style="animation-delay: 0s;">🤡</span>
+        <span class="floating-emoji absolute top-[18%] right-[10%] text-3xl sm:text-5xl opacity-35 animate-float-bounce" style="animation-delay: 1.1s;">🦆</span>
+        <span class="floating-emoji absolute bottom-[18%] left-[12%] text-3xl sm:text-5xl opacity-35 animate-float-bounce" style="animation-delay: 2.2s;">🍌</span>
+        <span class="floating-emoji absolute bottom-[15%] right-[9%] text-3xl sm:text-5xl opacity-35 animate-float-bounce" style="animation-delay: 0.7s;">🤪</span>
+    </div>
 
-    onValue(foodsRef, (snapshot) => {
-      isCloudConnected = true;
-      if (syncDot) syncDot.className = "w-2 h-2 rounded-full bg-emerald-400";
-      if (syncText) syncText.innerText = "Live";
+    <!-- Custom subtle trailing cursor dot for desktop -->
+    <div id="custom-cursor" class="hidden md:block pointer-events-none fixed top-0 left-0 w-4 h-4 rounded-full bg-rose-500/80 mix-blend-screen -translate-x-1/2 -translate-y-1/2 transition-transform duration-150 ease-out z-50"></div>
 
-      const data = snapshot.val();
-      if (!data) {
-        SEED_ITEMS.forEach(item => {
-          set(ref(databaseObj, 'food_items/' + item.id), item);
-        });
-      } else {
-        foods = Object.values(data);
-        window.renderFoodGrid();
-      }
-    }, (error) => {
-      console.error("Database sync error:", error);
-      isCloudConnected = false;
-      if (syncDot) syncDot.className = "w-2 h-2 rounded-full bg-amber-400";
-      if (syncText) syncText.innerText = "Offline Mode";
-      loadLocalData();
-    });
-  }
-
-  function loadLocalData() {
-    const saved = localStorage.getItem('penguin_food_store_items');
-    if (saved) {
-      foods = JSON.parse(saved);
-    } else {
-      foods = [...SEED_ITEMS];
-      saveLocalData();
-    }
-    window.renderFoodGrid();
-  }
-
-  function saveLocalData() {
-    localStorage.setItem('penguin_food_store_items', JSON.stringify(foods));
-  }
-
-  function showToast(message, type = "info") {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-
-    const toast = document.createElement('div');
-    const bgClass = type === "success" ? "bg-emerald-600 text-white border-emerald-400" :
-                    type === "warn" ? "bg-amber-600 text-white border-amber-400" : "bg-custom-card text-white border-custom";
-
-    toast.className = `px-3.5 py-2.5 rounded-xl border ${bgClass} text-xs font-semibold shadow-2xl flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto`;
-    toast.innerHTML = `<span>${escHtml(message)}</span>`;
-
-    container.appendChild(toast);
-
-    requestAnimationFrame(() => {
-      toast.classList.remove('translate-y-2', 'opacity-0');
-    });
-
-    setTimeout(() => {
-      toast.classList.add('opacity-0', 'translate-y-2');
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
-
-  function escHtml(str) {
-    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-
-  function escAttr(str) {
-    return String(str ?? '').replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-  }
-
-  function avgRatingNum(ratings) {
-    if (!ratings || ratings.length === 0) return 5;
-    return ratings.reduce((a, b) => a + b, 0) / ratings.length;
-  }
-
-  function getAvgRating(ratings) {
-    return avgRatingNum(ratings).toFixed(2);
-  }
-
-  function getImageForKeyword(name, customKey) {
-    const query = (customKey || name).toLowerCase();
-    if (query.includes('cookie')) return 'https://images.unsplash.com/photo-1558961362-fa8fdf82db35?auto=format&fit=crop&w=600&q=80';
-    if (query.includes('peanut')) return 'https://images.unsplash.com/photo-1567892320420-1c657571ea48?auto=format&fit=crop&w=600&q=80';
-    if (query.includes('fruit') || query.includes('salad')) return 'https://images.unsplash.com/photo-1568721776562-f375c78f02f9?auto=format&fit=crop&w=600&q=80';
-    if (query.includes('custard') || query.includes('dessert')) return 'https://images.unsplash.com/photo-1551024708-8f23befc6f87?auto=format&fit=crop&w=600&q=80';
-    if (query.includes('corn')) return 'https://images.unsplash.com/photo-1551782449-a2132b4ba21d?auto=format&fit=crop&w=600&q=80';
-    if (query.includes('juice') || query.includes('drink')) return 'https://images.unsplash.com/photo-1613478223718-2ab802602423?auto=format&fit=crop&w=600&q=80';
-    if (query.includes('sandwich')) return 'https://images.unsplash.com/photo-1528735602779-2552fd46c7af?auto=format&fit=crop&w=600&q=80';
-    return 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80';
-  }
-
-  // Exposed Global Handlers
-  window.renderFoodGrid = function() {
-    const grid = document.getElementById('food-grid');
-    const emptyState = document.getElementById('empty-state');
-    const searchInput = document.getElementById('search-input');
-    const dietFilterEl = document.getElementById('diet-filter');
-
-    if (!grid) return;
-
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const dietFilter = dietFilterEl ? dietFilterEl.value : 'ALL';
-
-    let itemsToDisplay = foods.filter(item => {
-      const matchesSearch = (item.name || '').toLowerCase().includes(searchTerm) || (item.category && item.category.toLowerCase().includes(searchTerm));
-      const matchesDiet = dietFilter === 'ALL' || item.tag === dietFilter || (dietFilter === 'Vegan' && item.category && item.category.includes('Salad'));
-      return matchesSearch && matchesDiet;
-    });
-
-    if (currentTab === 'leaderboard') {
-      itemsToDisplay = [...itemsToDisplay].sort((a, b) => {
-        const voteDiff = (b.upvotes || 0) - (a.upvotes || 0);
-        if (voteDiff !== 0) return voteDiff;
-        return avgRatingNum(b.ratings) - avgRatingNum(a.ratings);
-      });
-    }
-
-    if (itemsToDisplay.length === 0) {
-      grid.innerHTML = '';
-      if (emptyState) emptyState.classList.remove('hidden');
-      return;
-    }
-
-    if (emptyState) emptyState.classList.add('hidden');
-
-    grid.innerHTML = itemsToDisplay.map((food, idx) => {
-      const avgRating = getAvgRating(food.ratings);
-      const hasVoted = userVotes.includes(food.id);
-
-      const rankBadge = (currentTab === 'leaderboard' && idx < 3) ? 
-        `<span class="absolute top-2 left-3 bg-amber-500 text-black text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg z-10">#${idx + 1} TOP</span>` : '';
-
-      const voteBtnClass = hasVoted 
-        ? "flex-1 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-400/50 py-1.5 sm:py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow transition"
-        : "flex-1 btn-primary py-1.5 sm:py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow transition";
-
-      const voteBtnIcon = hasVoted ? "check-circle" : "thumbs-up";
-      const voteBtnText = hasVoted ? "Voted" : "Upvote";
-      const safeId = escAttr(food.id);
-
-      return `
-        <div class="bg-custom-card border border-custom rounded-2xl overflow-hidden hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between group relative shadow-lg">
-          ${rankBadge}
-          
-          ${isAdmin ? `
-            <button onclick="promptDeleteFood('${safeId}', '${escAttr(food.name)}')" class="absolute top-2 right-3 bg-rose-600/90 hover:bg-rose-600 text-white p-1.5 rounded-lg text-xs z-20 transition" title="Delete suggestion">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
-            </button>
-          ` : ''}
-
-          <div>
-            <div class="h-36 sm:h-44 overflow-hidden relative bg-black/40">
-              <img src="${escAttr(food.image)}" alt="${escAttr(food.name)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80'">
-              <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-medium text-emerald-400 border border-custom flex items-center gap-1">
-                <span>${escHtml(food.category || 'Healthy Snack')}</span>
-                ${food.price ? `<span class="text-white bg-emerald-500/20 px-1 py-0.2 rounded font-bold">₹${escHtml(food.price)}</span>` : ''}
-              </div>
-              ${food.tag ? `<div class="absolute top-2 right-3 bg-purple-500/80 backdrop-blur-md text-white text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full">${escHtml(food.tag)}</div>` : ''}
-            </div>
-
-            <div class="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
-              <div class="flex items-start justify-between gap-1">
-                <h3 class="font-bold text-white text-sm sm:text-base leading-snug">${escHtml(food.name)}</h3>
-                <div class="flex items-center gap-1 text-[11px] sm:text-xs text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded-md border border-amber-400/20 shrink-0">
-                  ★ <span>${avgRating}</span>
-                </div>
-              </div>
-
-              <p class="text-xs text-custom-muted line-clamp-2 leading-relaxed">
-                ${escHtml(food.description || 'Healthy canteen choice suggested by students.')}
-              </p>
-
-              <div class="flex items-center justify-between pt-1">
-                <div class="flex items-center gap-1">
-                  <span class="text-[11px] text-custom-muted mr-1">Rate:</span>
-                  ${[1, 2, 3, 4, 5].map(star => `
-                    <button onclick="rateFood('${safeId}',${star})" class="text-xs text-slate-500 hover:text-amber-400 transition transform hover:scale-125">
-                      ★
-                    </button>
-                  `).join('')}
-                </div>
-                ${food.calories ? `<span class="text-[11px] text-emerald-400/80 font-mono">${escHtml(food.calories)}</span>` : ''}
-              </div>
-            </div>
-          </div>
-
-          <div class="p-3 sm:p-4 pt-0 space-y-2 border-t border-custom/50 mt-2">
-            <div class="flex items-center justify-between gap-2 pt-2.5 sm:pt-3">
-              <button onclick="voteFood('${safeId}')" class="${voteBtnClass}">
-                <i data-lucide="${voteBtnIcon}" class="w-3.5 h-3.5"></i> ${voteBtnText}
-                <span class="bg-black/30 px-1.5 py-0.5 rounded-full text-[10px] ml-1">${food.upvotes || 0}</span>
-              </button>
-
-              <button onclick="openCommentsModal('${safeId}')" class="p-2 rounded-xl border border-custom bg-black/30 hover:bg-custom-card-hover text-custom-muted hover:text-white text-xs flex items-center gap-1.5 transition">
-                <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                <span class="text-[11px]">${food.comments ? food.comments.length : 0}</span>
-              </button>
-            </div>
-          </div>
+    <!-- Top Bar: Live Time Wasted Stopwatch & Mute Toggle -->
+    <header class="relative z-20 w-full max-w-5xl flex flex-wrap items-center justify-between gap-3 pt-1">
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-zinc-900/90 border border-zinc-800/80 shadow-md backdrop-blur-sm">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            <span class="text-xs sm:text-sm font-medium text-zinc-300">
+                Official Time Wasted: <strong id="stopwatch-display" class="font-mono font-bold text-rose-400">0.0s</strong> and counting...
+            </span>
         </div>
-      `;
-    }).join('');
 
-    if (window.lucide) window.lucide.createIcons();
-  };
+        <button 
+            id="mute-btn"
+            type="button"
+            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-800 text-xs sm:text-sm font-medium text-zinc-300 transition-colors cursor-pointer"
+            aria-label="Toggle Goofy Sound Effects"
+        >
+            <span id="mute-icon">🔊</span>
+            <span id="mute-label" class="hidden sm:inline">Goofy SFX: ON</span>
+        </button>
+    </header>
 
-  window.voteFood = async function(id) {
-    const item = foods.find(f => f.id === id);
-    if (!item) return;
+    <!-- Main Centered Typography Container -->
+    <main class="relative z-10 max-w-4xl w-full text-center flex flex-col items-center justify-center my-auto py-6">
+        <!-- Spinning Goofy Badge -->
+        <div id="goofy-badge" class="mb-4 sm:mb-6 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-300 text-xs sm:text-sm font-semibold animate-wiggle-slow cursor-pointer" title="Click me for a honk!">
+            <span class="inline-block animate-spin" style="animation-duration: 6s;">🎪</span>
+            <span>CERTIFIED TIME-WASTER</span>
+        </div>
 
-    const hasVoted = userVotes.includes(id);
+        <h1 class="flex flex-col items-center justify-center space-y-2 sm:space-y-4 tracking-tight">
+            <!-- Line 1 -->
+            <span class="opacity-0 animate-fade-up-1 text-2xl sm:text-4xl md:text-5xl font-semibold text-zinc-300">
+                Thank you for wasting your time
+            </span>
+            
+            <!-- Line 2 (Punchline) -->
+            <span class="opacity-0 animate-fade-up-2 text-5xl sm:text-7xl md:text-8xl font-black text-white tracking-tighter py-1 sm:py-2 hover:scale-[1.03] transition-transform duration-300 cursor-default">
+                Now Get Lost
+            </span>
+            
+            <!-- Line 3 -->
+            <span class="opacity-0 animate-fade-up-3 text-xl sm:text-3xl md:text-4xl font-semibold text-zinc-400">
+                And send it to another person
+            </span>
+        </h1>
 
-    if (hasVoted) {
-      userVotes = userVotes.filter(vId => vId !== id);
-      item.upvotes = Math.max(0, (item.upvotes || 1) - 1);
-      showToast(`Vote removed for ${item.name}`, "info");
-    } else {
-      userVotes.push(id);
-      item.upvotes = (item.upvotes || 0) + 1;
-      showToast(`Voted for ${item.name}!`, "success");
-      if (window.confetti) window.confetti({ particleCount: 30, spread: 50, origin: { y: 0.75 } });
-    }
+        <!-- Interactive Buttons Area -->
+        <div class="opacity-0 animate-fade-in-btn mt-10 sm:mt-14 flex flex-wrap items-center justify-center gap-4">
+            <button 
+                id="copy-btn"
+                type="button"
+                class="group relative inline-flex items-center justify-center gap-3 px-6 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-semibold text-zinc-950 bg-zinc-100 hover:bg-white active:scale-95 rounded-full shadow-lg shadow-white/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-zinc-950 cursor-pointer"
+                aria-label="Copy Link to Prank Someone Else"
+            >
+                <!-- Copy Icon -->
+                <svg id="icon-copy" class="w-5 h-5 text-zinc-800 transition-transform duration-200 group-hover:rotate-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                <!-- Check Icon (Hidden by default) -->
+                <svg id="icon-check" class="w-5 h-5 text-emerald-600 hidden" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span id="btn-text">Copy Link to Prank Someone Else</span>
+            </button>
 
-    saveUserVotes();
+            <!-- Initial Placeholder for Runaway Leave Button -->
+            <div id="runaway-anchor" class="inline-block">
+                <button
+                    id="runaway-btn"
+                    type="button"
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:px-7 sm:py-4 text-sm sm:text-base font-bold text-rose-200 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 rounded-full shadow-lg transition-all duration-150 cursor-pointer z-30"
+                >
+                    <span>🚪</span>
+                    <span id="runaway-text">Leave Page</span>
+                </button>
+            </div>
+        </div>
+    </main>
 
-    if (isCloudConnected && databaseObj) {
-      try {
-        await update(ref(databaseObj, 'food_items/' + id), { upvotes: item.upvotes });
-      } catch (err) {
-        console.error("Vote write failed:", err);
-        showToast("Could not save your vote. Check your connection.", "warn");
-      }
-    } else {
-      saveLocalData();
-      window.renderFoodGrid();
-    }
-  };
+    <!-- Bottom Subtle Footer Hint -->
+    <footer class="relative z-10 text-center pb-1">
+        <p id="dodge-counter-text" class="text-xs text-zinc-500 transition-opacity duration-300 opacity-0">
+            Escape attempts failed: <span id="dodge-count" class="font-bold text-zinc-300">0</span> 🤡
+        </p>
+    </footer>
 
-  window.handleAddFood = async function(e) {
-    e.preventDefault();
-    const nameInput = document.getElementById('food-name').value.trim();
-    const category = document.getElementById('food-category').value;
-    const priceVal = parseInt(document.getElementById('food-price').value) || 30;
-    const customImg = document.getElementById('food-image').value.trim();
-    const desc = document.getElementById('food-desc').value.trim();
-    const errBox = document.getElementById('add-error');
-    const errMsg = document.getElementById('add-error-msg');
+    <!-- Confirmation Toast Notification -->
+    <div 
+        id="toast" 
+        role="status" 
+        aria-live="polite"
+        class="fixed bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 px-5 py-3 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-100 text-sm font-medium shadow-2xl opacity-0 translate-y-4 pointer-events-none transition-all duration-300"
+    >
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Link copied! Go ruin someone's focus.</span>
+    </div>
 
-    if (!nameInput) {
-      if (errMsg) errMsg.innerText = "Please enter a dish name.";
-      if (errBox) errBox.classList.remove('hidden');
-      return;
-    }
+    <!-- Hidden textarea fallback for iframe-safe clipboard copying -->
+    <textarea id="clipboard-helper" class="sr-only" aria-hidden="true" tabindex="-1"></textarea>
 
-    const isDuplicate = foods.some(item => (item.name || '').toLowerCase() === nameInput.toLowerCase());
-    if (isDuplicate) {
-      if (errMsg) errMsg.innerText = `"${nameInput}" is already suggested in the list!`;
-      if (errBox) errBox.classList.remove('hidden');
-      return;
-    }
-    if (errBox) errBox.classList.add('hidden');
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyBtn = document.getElementById('copy-btn');
+            const btnText = document.getElementById('btn-text');
+            const iconCopy = document.getElementById('icon-copy');
+            const iconCheck = document.getElementById('icon-check');
+            const toast = document.getElementById('toast');
+            const clipboardHelper = document.getElementById('clipboard-helper');
+            const customCursor = document.getElementById('custom-cursor');
 
-    const newItem = {
-      id: 'food-' + Date.now(),
-      name: nameInput,
-      category: category,
-      price: priceVal,
-      description: desc || "Healthy item suggested by student community.",
-      image: customImg ? (customImg.startsWith('http') ? customImg : getImageForKeyword(nameInput, customImg)) : getImageForKeyword(nameInput),
-      upvotes: 1,
-      ratings: [5],
-      comments: [],
-      createdAt: new Date().toISOString()
-    };
+            // Goofy feature elements
+            const stopwatchDisplay = document.getElementById('stopwatch-display');
+            const runawayBtn = document.getElementById('runaway-btn');
+            const runawayText = document.getElementById('runaway-text');
+            const dodgeCounterText = document.getElementById('dodge-counter-text');
+            const dodgeCountEl = document.getElementById('dodge-count');
+            const muteBtn = document.getElementById('mute-btn');
+            const muteIcon = document.getElementById('mute-icon');
+            const muteLabel = document.getElementById('mute-label');
+            const goofyBadge = document.getElementById('goofy-badge');
 
-    userVotes.push(newItem.id);
-    saveUserVotes();
+            let toastTimeout = null;
+            let btnTimeout = null;
+            let isMuted = false;
+            let dodgeCount = 0;
+            let isEscaping = false;
 
-    if (isCloudConnected && databaseObj) {
-      try {
-        await set(ref(databaseObj, 'food_items/' + newItem.id), newItem);
-      } catch (err) {
-        console.error("Add write failed:", err);
-        showToast("Could not save to the cloud. Try again.", "warn");
-      }
-    } else {
-      foods.unshift(newItem);
-      saveLocalData();
-      window.renderFoodGrid();
-    }
+            const taunts = [
+                "Too slow! 😜",
+                "Nope! 🦆",
+                "Nice try! 🤡",
+                "You're stuck here!",
+                "Almost! 🍌",
+                "Can't catch me!",
+                "Error 404: Exit not found",
+                "Stay a little longer!",
+                "Whoops, missed!",
+                "Not today! 🤪"
+            ];
 
-    showToast(`Added "${newItem.name}" to menu suggestions!`, "success");
-    if (window.confetti) window.confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
-    window.closeAddModal();
-    document.getElementById('add-food-form').reset();
-  };
+            // --- 1. Live "Time Wasted" Stopwatch ---
+            const startTime = performance.now();
+            function updateStopwatch() {
+                const elapsedSeconds = (performance.now() - startTime) / 1000;
+                stopwatchDisplay.textContent = `${elapsedSeconds.toFixed(1)}s`;
+                requestAnimationFrame(updateStopwatch);
+            }
+            requestAnimationFrame(updateStopwatch);
 
-  window.rateFood = async function(id, stars) {
-    const item = foods.find(f => f.id === id);
-    if (!item) return;
+            // --- 2. Web Audio API Goofy Sound Synthesizer ---
+            let audioCtx = null;
+            function getAudioContext() {
+                if (!audioCtx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) {
+                        audioCtx = new AudioContextClass();
+                    }
+                }
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().catch(() => {});
+                }
+                return audioCtx;
+            }
 
-    const newRatings = [...(item.ratings || []), stars];
+            // Play a springy "Boing" sound when the runaway button dodges
+            function playBoingSound() {
+                if (isMuted) return;
+                const ctx = getAudioContext();
+                if (!ctx) return;
 
-    if (isCloudConnected && databaseObj) {
-      try {
-        await update(ref(databaseObj, 'food_items/' + id), { ratings: newRatings });
-      } catch (err) {
-        console.error("Rating write failed:", err);
-        showToast("Could not save your rating.", "warn");
-      }
-    } else {
-      item.ratings = newRatings;
-      saveLocalData();
-      window.renderFoodGrid();
-    }
-    showToast(`Rated ${stars} ★ for ${item.name}!`, "success");
-  };
+                try {
+                    const now = ctx.currentTime;
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
 
-  window.confirmDeleteFood = async function() {
-    if (!pendingDeleteFoodId) return;
-    const id = pendingDeleteFoodId;
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.exponentialRampToValueAtTime(520, now + 0.14);
+                    osc.frequency.exponentialRampToValueAtTime(240, now + 0.28);
 
-    if (isCloudConnected && databaseObj) {
-      try {
-        await remove(ref(databaseObj, 'food_items/' + id));
-      } catch (err) {
-        console.error("Delete failed:", err);
-        showToast("Could not delete that suggestion.", "warn");
-      }
-    } else {
-      foods = foods.filter(f => f.id !== id);
-      saveLocalData();
-      window.renderFoodGrid();
-    }
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
 
-    showToast("Suggestion deleted.", "warn");
-    window.closeDeleteModal();
-  };
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
 
-  window.handleAddComment = async function(e) {
-    e.preventDefault();
-    const input = document.getElementById('comment-input');
-    const val = input.value.trim();
-    if (!val || !currentCommentFoodId) return;
+                    osc.start(now);
+                    osc.stop(now + 0.31);
+                } catch (e) {}
+            }
 
-    const item = foods.find(f => f.id === currentCommentFoodId);
-    if (!item) return;
+            // Play a clown/duck "Honk" sound
+            function playHonkSound() {
+                if (isMuted) return;
+                const ctx = getAudioContext();
+                if (!ctx) return;
 
-    const newComments = [...(item.comments || []), val];
+                try {
+                    const now = ctx.currentTime;
+                    const osc1 = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const gain = ctx.createGain();
 
-    if (isCloudConnected && databaseObj) {
-      try {
-        await update(ref(databaseObj, 'food_items/' + currentCommentFoodId), { comments: newComments });
-      } catch (err) {
-        console.error("Comment write failed:", err);
-        showToast("Could not post your comment.", "warn");
-      }
-    } else {
-      item.comments = newComments;
-      saveLocalData();
-      window.renderFoodGrid();
-    }
+                    osc1.type = 'sawtooth';
+                    osc2.type = 'triangle';
+                    osc1.frequency.setValueAtTime(290, now);
+                    osc1.frequency.linearRampToValueAtTime(235, now + 0.18);
+                    osc2.frequency.setValueAtTime(295, now);
+                    osc2.frequency.linearRampToValueAtTime(240, now + 0.18);
 
-    renderCommentsList(newComments);
-    input.value = '';
-  };
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
 
-  window.promptDeleteFood = function(id, name) {
-    pendingDeleteFoodId = id;
-    const delMsg = document.getElementById('delete-modal-msg');
-    const delModal = document.getElementById('delete-modal');
-    if (delMsg) delMsg.innerText = `Remove "${name}" from suggestions?`;
-    if (delModal) delModal.classList.remove('hidden');
-  };
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(ctx.destination);
 
-  window.closeDeleteModal = function() {
-    pendingDeleteFoodId = null;
-    const delModal = document.getElementById('delete-modal');
-    if (delModal) delModal.classList.add('hidden');
-  };
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + 0.23);
+                    osc2.stop(now + 0.23);
+                } catch (e) {}
+            }
 
-  window.openCommentsModal = function(id) {
-    currentCommentFoodId = id;
-    const item = foods.find(f => f.id === id);
-    if (!item) return;
+            // Play a cheerful celebratory chime + slide whistle on copy
+            function playCelebrateSound() {
+                if (isMuted) return;
+                const ctx = getAudioContext();
+                if (!ctx) return;
 
-    const titleEl = document.getElementById('comment-food-title');
-    const modalEl = document.getElementById('comments-modal');
-    if (titleEl) titleEl.innerText = `${item.name} Comments`;
-    renderCommentsList(item.comments || []);
-    if (modalEl) modalEl.classList.remove('hidden');
-  };
+                try {
+                    const now = ctx.currentTime;
+                    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                    notes.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.06);
 
-  function renderCommentsList(comments) {
-    const list = document.getElementById('comments-list');
-    if (!list) return;
+                        gain.gain.setValueAtTime(0.14, now + idx * 0.06);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.25);
 
-    if (!comments || comments.length === 0) {
-      list.innerHTML = `<p class="text-xs text-custom-muted italic text-center py-3">No comments yet. Leave a friendly note!</p>`;
-      return;
-    }
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
 
-    list.innerHTML = comments.map(c => `
-      <div class="bg-black/40 border border-custom p-2.5 rounded-xl text-xs text-slate-200 flex items-start gap-2">
-        <span class="text-emerald-400 font-bold">💬</span>
-        <p class="leading-relaxed">${escHtml(c)}</p>
-      </div>
-    `).join('');
-  }
+                        osc.start(now + idx * 0.06);
+                        osc.stop(now + idx * 0.06 + 0.26);
+                    });
+                } catch (e) {}
+            }
 
-  window.closeCommentsModal = function() {
-    const modalEl = document.getElementById('comments-modal');
-    if (modalEl) modalEl.classList.add('hidden');
-  };
+            // Mute toggle button
+            muteBtn.addEventListener('click', () => {
+                isMuted = !isMuted;
+                muteIcon.textContent = isMuted ? '🔇' : '🔊';
+                muteLabel.textContent = isMuted ? 'Goofy SFX: OFF' : 'Goofy SFX: ON';
+                if (!isMuted) playHonkSound();
+            });
 
-  window.switchTab = function(tab) {
-    currentTab = tab;
-    const btnLeaderboard = document.getElementById('tab-leaderboard');
-    const btnDiscovery = document.getElementById('tab-discovery');
+            // Clicking the spinning badge plays a clown honk and spawns mini emojis
+            goofyBadge.addEventListener('click', (e) => {
+                playHonkSound();
+                spawnEmojiBurst(e.clientX, e.clientY, 10);
+            });
 
-    if (tab === 'leaderboard') {
-      if (btnLeaderboard) btnLeaderboard.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition bg-custom-card text-white shadow";
-      if (btnDiscovery) btnDiscovery.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition text-custom-muted hover:text-white";
-    } else {
-      if (btnDiscovery) btnDiscovery.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition bg-custom-card text-white shadow";
-      if (btnLeaderboard) btnLeaderboard.className = "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition text-custom-muted hover:text-white";
-      window.shuffleGrid();
-    }
-    window.renderFoodGrid();
-  };
+            // --- 3. Runaway "Leave Page" Button ---
+            function dodgeButton(e) {
+                if (e) e.preventDefault();
+                playBoingSound();
 
-  window.shuffleGrid = function() {
-    for (let i = foods.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [foods[i], foods[j]] = [foods[j], foods[i]];
-    }
-    window.renderFoodGrid();
-  };
+                dodgeCount++;
+                dodgeCountEl.textContent = dodgeCount;
+                dodgeCounterText.classList.remove('opacity-0');
+                dodgeCounterText.classList.add('opacity-100');
 
-  window.changeTheme = function(themeClass) {
-    document.body.className = `${themeClass} min-h-screen flex flex-col antialiased overflow-x-hidden bg-[#060b0f] text-white selection:bg-emerald-500/30`;
-  };
+                // Pick a funny taunt
+                const randomTaunt = taunts[Math.floor(Math.random() * taunts.length)];
+                runawayText.textContent = randomTaunt;
 
-  window.openAdminModal = function() {
-    if (isAdmin) {
-      isAdmin = false;
-      showToast("Logged out of Admin mode.", "info");
-      window.renderFoodGrid();
-    } else {
-      const pinInput = document.getElementById('admin-pin-input');
-      const modal = document.getElementById('admin-modal');
-      if (pinInput) pinInput.value = '';
-      if (modal) modal.classList.remove('hidden');
-    }
-  };
+                // Switch button to fixed positioning on first dodge so it can roam the viewport safely
+                if (!isEscaping) {
+                    const rect = runawayBtn.getBoundingClientRect();
+                    runawayBtn.style.position = 'fixed';
+                    runawayBtn.style.left = `${rect.left}px`;
+                    runawayBtn.style.top = `${rect.top}px`;
+                    runawayBtn.style.margin = '0';
+                    isEscaping = true;
+                }
 
-  window.closeAdminModal = function() {
-    const modal = document.getElementById('admin-modal');
-    if (modal) modal.classList.add('hidden');
-  };
+                // Calculate safe random coordinates inside viewport with padding
+                const padding = 24;
+                const btnRect = runawayBtn.getBoundingClientRect();
+                const maxX = Math.max(padding, window.innerWidth - btnRect.width - padding);
+                const maxY = Math.max(padding + 56, window.innerHeight - btnRect.height - padding);
 
-  window.submitAdminUnlock = function() {
-    const pinInput = document.getElementById('admin-pin-input');
-    const pin = pinInput ? pinInput.value : '';
-    if (pin === ADMIN_PIN) {
-      isAdmin = true;
-      showToast("Admin mode unlocked!", "success");
-      window.closeAdminModal();
-      window.renderFoodGrid();
-    } else {
-      showToast("Incorrect Passcode!", "warn");
-    }
-  };
+                let nextX = padding + Math.random() * (maxX - padding);
+                let nextY = (padding + 56) + Math.random() * (maxY - (padding + 56));
 
-  window.openAddModal = () => { const m = document.getElementById('add-modal'); if (m) m.classList.remove('hidden'); };
-  window.closeAddModal = () => { const m = document.getElementById('add-modal'); if (m) m.classList.add('hidden'); };
+                // Ensure it jumps a noticeable distance from its current spot
+                if (Math.abs(nextX - btnRect.left) < 90) {
+                    nextX = btnRect.left > window.innerWidth / 2 ? padding + 20 : maxX - 20;
+                }
 
-  window.openNoticeModal = () => { const m = document.getElementById('notice-modal'); if (m) m.classList.remove('hidden'); };
-  window.closeNoticeModal = () => { const m = document.getElementById('notice-modal'); if (m) m.classList.add('hidden'); };
+                const randomTilt = (Math.random() - 0.5) * 24;
+                runawayBtn.style.left = `${nextX}px`;
+                runawayBtn.style.top = `${nextY}px`;
+                runawayBtn.style.transform = `rotate(${randomTilt}deg) scale(1.05)`;
+            }
 
-  window.openLetterModal = () => {
-    window.updateLetterText();
-    const m = document.getElementById('letter-modal');
-    if (m) m.classList.remove('hidden');
-  };
-  window.closeLetterModal = () => { const m = document.getElementById('letter-modal'); if (m) m.classList.add('hidden'); };
+            runawayBtn.addEventListener('mouseenter', dodgeButton);
+            runawayBtn.addEventListener('touchstart', dodgeButton, { passive: false });
+            runawayBtn.addEventListener('click', dodgeButton);
 
-  window.updateLetterText = function() {
-    const groupEl = document.getElementById('letter-group');
-    const managerEl = document.getElementById('letter-manager');
-    const outputEl = document.getElementById('letter-output');
+            // Keep runaway button inside screen on window resize
+            window.addEventListener('resize', () => {
+                if (!isEscaping) return;
+                const rect = runawayBtn.getBoundingClientRect();
+                const clampedX = Math.min(Math.max(16, rect.left), window.innerWidth - rect.width - 16);
+                const clampedY = Math.min(Math.max(64, rect.top), window.innerHeight - rect.height - 16);
+                runawayBtn.style.left = `${clampedX}px`;
+                runawayBtn.style.top = `${clampedY}px`;
+            });
 
-    const group = (groupEl && groupEl.value) || "Students of Penguin_Club";
-    const manager = (managerEl && managerEl.value) || "The Canteen Manager";
+            // --- 4. Confetti / Goofy Emoji Burst on Copy ---
+            function spawnEmojiBurst(originX, originY, count = 24) {
+                const burstEmojis = ['🤡', '🦆', '🍌', '🤪', '🎉', '💀', '😂', '🚀'];
+                for (let i = 0; i < count; i++) {
+                    const el = document.createElement('span');
+                    el.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
+                    el.className = 'pointer-events-none fixed z-50 text-2xl sm:text-3xl select-none';
+                    el.style.left = `${originX}px`;
+                    el.style.top = `${originY}px`;
+                    document.body.appendChild(el);
 
-    const topItems = [...foods].sort((a,b) => (b.upvotes || 0) - (a.upvotes || 0)).slice(0, 5);
-    const itemListStr = topItems.map((item, idx) => `  ${idx + 1}. ${item.name} (${item.upvotes || 0} student votes, ${getAvgRating(item.ratings)}★ rating)`).join('\n');
+                    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+                    const velocity = 90 + Math.random() * 190;
+                    const destX = Math.cos(angle) * velocity;
+                    const destY = Math.sin(angle) * velocity - 60;
+                    const spin = (Math.random() - 0.5) * 540;
 
-    const letter = `To: ${manager}
-From: ${group}
-Date: ${new Date().toLocaleDateString()}
+                    const anim = el.animate([
+                        { transform: 'translate(-50%, -50%) scale(0.4) rotate(0deg)', opacity: 1 },
+                        { transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(1.2) rotate(${spin}deg)`, opacity: 1, offset: 0.7 },
+                        { transform: `translate(calc(-50% + ${destX * 1.15}px), calc(-50% + ${destY + 90}px)) scale(0.7) rotate(${spin * 1.2}deg)`, opacity: 0 }
+                    ], {
+                        duration: 900 + Math.random() * 400,
+                        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                        fill: 'forwards'
+                    });
 
-Subject: Student Request Petition for Canteen Menu Addition
+                    anim.onfinish = () => el.remove();
+                }
+            }
 
-Respected Canteen In-Charge,
+            // Subtle trailing cursor effect on desktop pointers
+            window.addEventListener('mousemove', (e) => {
+                if (!customCursor) return;
+                customCursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+            });
 
-We are writing on behalf of ${group} to politely suggest adding fresh, healthy food options to our daily campus canteen menu.
+            // Scale cursor slightly on interactive hover
+            copyBtn.addEventListener('mouseenter', () => {
+                if (customCursor) customCursor.classList.add('scale-150');
+            });
+            copyBtn.addEventListener('mouseleave', () => {
+                if (customCursor) customCursor.classList.remove('scale-150');
+            });
 
-Based on active real-time student voting on our Penguin_Club Food Store portal, the top requested snacks and dishes are:
+            // Reliable clipboard copy function (works in standard browsers & sandboxed iframes)
+            function copyCurrentUrl(e) {
+                const urlToCopy = window.location.href;
+                const rect = copyBtn.getBoundingClientRect();
+                const burstX = (e && e.clientX) ? e.clientX : rect.left + rect.width / 2;
+                const burstY = (e && e.clientY) ? e.clientY : rect.top + rect.height / 2;
 
-${itemListStr || "  1. Fresh Fruit Salad\n  2. Roasted Peanuts\n  3. Sweet Corn Chat"}
+                playCelebrateSound();
+                spawnEmojiBurst(burstX, burstY, 26);
+                
+                try {
+                    clipboardHelper.value = urlToCopy;
+                    clipboardHelper.select();
+                    clipboardHelper.setSelectionRange(0, 99999);
+                    const successful = document.execCommand('copy');
+                    
+                    if (!successful && navigator.clipboard) {
+                        navigator.clipboard.writeText(urlToCopy);
+                    }
+                    triggerFeedback();
+                } catch (err) {
+                    // Fallback attempt
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(urlToCopy).then(triggerFeedback).catch(() => {});
+                    }
+                }
+            }
 
-These items are healthy, hygienic, easy to prepare, and highly popular among students. We kindly request you to consider introducing these items in the upcoming week.
+            // Show visual feedback on button and toast
+            function triggerFeedback() {
+                // Update button state
+                btnText.textContent = 'Copied! Pass it on';
+                iconCopy.classList.add('hidden');
+                iconCheck.classList.remove('hidden');
 
-Thank you for your continuous support and effort in keeping our campus well-fed and healthy!
+                // Show toast
+                toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                toast.classList.add('opacity-100', 'translate-y-0');
 
-Warm regards,
-${group}`;
+                // Clear existing timers if clicked repeatedly
+                clearTimeout(btnTimeout);
+                clearTimeout(toastTimeout);
 
-    if (outputEl) outputEl.value = letter;
-  };
+                btnTimeout = setTimeout(() => {
+                    btnText.textContent = 'Copy Link to Prank Someone Else';
+                    iconCopy.classList.remove('hidden');
+                    iconCheck.classList.add('hidden');
+                }, 2500);
 
-  window.copyLetterText = function() {
-    const outputEl = document.getElementById('letter-output');
-    if (!outputEl) return;
-    navigator.clipboard.writeText(outputEl.value).then(() => {
-      const status = document.getElementById('letter-status');
-      if (status) {
-        status.classList.remove('opacity-0');
-        setTimeout(() => status.classList.add('opacity-0'), 2000);
-      }
-    }).catch(() => showToast("Copy blocked by the browser.", "warn"));
-  };
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                    toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                }, 3000);
+            }
 
-  window.downloadLetterText = function() {
-    const outputEl = document.getElementById('letter-output');
-    if (!outputEl) return;
-    const blob = new Blob([outputEl.value], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Canteen_Menu_Request_Letter.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-</script>
+            copyBtn.addEventListener('click', copyCurrentUrl);
+        });
+    </script>
 </body>
 </html>
